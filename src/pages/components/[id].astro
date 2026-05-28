@@ -1,0 +1,175 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const components = await getCollection("components");
+  return components.map((component) => ({
+    params: { id: component.id },
+    props: { component },
+  }));
+}
+
+const { component } = Astro.props;
+const { Content } = await render(component);
+const data = component.data;
+
+const title = data.title || component.id;
+---
+
+<BaseLayout title={title}>
+  <a href="/" class="back-link">&larr; All Robots</a>
+
+  <div class="component-header">
+    {data.tags && data.tags.length > 0 && (
+      <div class="tags">
+        {data.tags.map((tag: string) => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
+    )}
+    <h1>{title}</h1>
+    {data.description && <p class="description">{data.description}</p>}
+  </div>
+
+  <div class="component-meta">
+    {data.price && (
+      <div class="meta-item">
+        <span class="meta-label">Price</span>
+        <span class="meta-value price">&euro;{data.price}</span>
+      </div>
+    )}
+    {data.source && (
+      <div class="meta-item">
+        <span class="meta-label">Source</span>
+        <a href={data.source} target="_blank" rel="noopener" class="meta-value source-link">
+          {new URL(data.source).hostname.replace("www.", "")} &nearr;
+        </a>
+      </div>
+    )}
+    {data.created && (
+      <div class="meta-item">
+        <span class="meta-label">Saved</span>
+        <span class="meta-value">{data.created}</span>
+      </div>
+    )}
+  </div>
+
+  {data.main_image && (
+    <div class="main-image">
+      <img src={data.main_image} alt={title} loading="lazy" />
+    </div>
+  )}
+
+  <section class="content-section">
+    <Content />
+  </section>
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .back-link:hover {
+    color: var(--link);
+  }
+
+  .component-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tag {
+    background: var(--border);
+    color: var(--text-muted);
+    padding: 0.1rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .description {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .component-meta {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .meta-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .meta-value {
+    font-weight: 600;
+  }
+
+  .price {
+    color: var(--accent);
+    font-size: 1.2rem;
+  }
+
+  .source-link {
+    font-weight: 500;
+  }
+
+  .main-image {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .main-image img {
+    display: block;
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    background: var(--surface);
+  }
+
+  .content-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+  }
+
+  .content-section :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .content-section :global(img) {
+    max-height: 300px;
+    object-fit: contain;
+  }
+</style>

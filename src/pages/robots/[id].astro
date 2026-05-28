@@ -1,0 +1,244 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { resolveWikiLink, resolveRobotLink, displayValue } from "../../lib/utils";
+
+export async function getStaticPaths() {
+  const robots = await getCollection("robots");
+  return robots.map((robot) => ({
+    params: { id: robot.id },
+    props: { robot },
+  }));
+}
+
+const { robot } = Astro.props;
+const { Content } = await render(robot);
+const data = robot.data;
+
+const name = data.robot_name || robot.id;
+
+const weightDisplay = data.weight
+  ? `${data.weight}g`
+  : data.target_weight
+    ? `${data.target_weight}g (target)`
+    : undefined;
+
+const specs = [
+  { label: "Status", value: data.status },
+  { label: "Category", value: data.category },
+  { label: "Weight", value: weightDisplay },
+  { label: "Predecessor", value: data.predecessor, link: resolveRobotLink(data.predecessor) },
+  { label: "Successor", value: data.successor, link: resolveRobotLink(data.successor) },
+  { label: "Weapon Type", value: data.weapon_type },
+  { label: "Weapon Mass", value: data.weapon_mass },
+  { label: "Weapon Hardware", value: data.weapon_hardware },
+  { label: "Weapon Motor", value: data.weapon_motor },
+  { label: "Weapon Drive", value: data.weapon_drive },
+  { label: "Drum OD", value: data.weapon_drum_od },
+  { label: "Drum Length", value: data.weapon_drum_length },
+  { label: "Drum Bore", value: data.weapon_drum_bore },
+  { label: "Drum Shaft", value: data.weapon_drum_shaft },
+  { label: "Drum Bearings", value: data.weapon_drum_bearings },
+  { label: "Tooth Fastener", value: data.weapon_tooth_fastener },
+  { label: "Battery", value: data.battery_voltage, link: resolveWikiLink(data.battery_voltage) },
+  { label: "Gearing", value: data.gearing },
+  { label: "Drive Motors", value: data.drive_motors, link: resolveWikiLink(data.drive_motors) },
+  { label: "Drive Layout", value: data.drive_layout },
+  { label: "Wheel Pulley", value: data.wheel_pulley_diameter },
+  { label: "Wheels", value: data.wheels },
+  { label: "Armor", value: data.armor_material },
+  { label: "Wedge", value: data.wedge_specs },
+  { label: "Receiver", value: data.receiver, link: resolveWikiLink(data.receiver) },
+].filter((s) => s.value);
+---
+
+<BaseLayout title={name}>
+  <a href="/" class="back-link">&larr; All Robots</a>
+
+  <div class="robot-header">
+    <div>
+      <div class="badges">
+        <span class="category-badge">{data.category || "robot"}</span>
+        {data.status && <span class={`status-badge status-${data.status}`}>{data.status}</span>}
+      </div>
+      <h1>{name}</h1>
+      {data.concept && <p class="concept">{data.concept}</p>}
+      {data.status === "discontinued" && data.discontinued_after && (
+        <p class="discontinued-note">
+          Retired after <strong>{data.discontinued_after}</strong>
+          {data.discontinued_date && <> ({data.discontinued_date})</>}
+          {data.successor && resolveRobotLink(data.successor) && (
+            <> — succeeded by <a href={resolveRobotLink(data.successor)!.href}>{resolveRobotLink(data.successor)!.name}</a></>
+          )}
+        </p>
+      )}
+      {data.cad && (
+        <p class="cad-link">
+          <a href={data.cad} target="_blank" rel="noopener noreferrer">View CAD in Onshape →</a>
+        </p>
+      )}
+    </div>
+  </div>
+
+  <section class="specs-section">
+    <h2>Specifications</h2>
+    <table class="specs-table">
+      <tbody>
+        {specs.map((spec) => (
+          <tr>
+            <td class="spec-label">{spec.label}</td>
+            <td class="spec-value">
+              {spec.link ? (
+                <a href={spec.link.href}>{spec.link.name}</a>
+              ) : (
+                displayValue(spec.value!)
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="content-section">
+    <Content />
+  </section>
+</BaseLayout>
+
+<style>
+  .back-link {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .back-link:hover {
+    color: var(--link);
+  }
+
+  .robot-header {
+    margin-bottom: 2rem;
+  }
+
+  .badges {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .category-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--bg);
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: 0 2px 0 var(--accent-shadow);
+  }
+
+  .status-badge {
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .status-in-development,
+  .status-active {
+    background: var(--secondary);
+    color: var(--bg);
+    box-shadow: 0 2px 0 var(--secondary-shadow);
+  }
+
+  .status-discontinued, .status-retired {
+    background: rgba(232, 92, 44, 0.25);
+    color: #f4a48a;
+    border: 1px solid rgba(232, 92, 44, 0.4);
+  }
+
+  .discontinued-note {
+    margin-top: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(74, 45, 45, 0.4);
+    border-left: 3px solid #e3b6b6;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .cad-link {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .concept {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 1.1rem;
+  }
+
+  .specs-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .specs-section h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .specs-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .specs-table tr {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .specs-table tr:last-child {
+    border-bottom: none;
+  }
+
+  .specs-table td {
+    padding: 0.5rem 0;
+  }
+
+  .spec-label {
+    color: var(--text-muted);
+    width: 40%;
+    font-size: 0.9rem;
+  }
+
+  .spec-value {
+    font-weight: 500;
+  }
+
+  .content-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+  }
+
+  .content-section :global(hr) {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  .content-section :global(strong) {
+    color: var(--text);
+  }
+</style>

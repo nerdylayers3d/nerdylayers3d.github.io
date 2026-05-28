@@ -1,0 +1,189 @@
+---
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/nerdy-layers-logo.png" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <nav>
+      <a href="/" class="nav-brand">
+        <img src="/nerdy-layers-logo.png" alt="Nerdy Layers 3D" class="nav-logo" />
+        <span class="nav-text">Combat Robots</span>
+      </a>
+    </nav>
+    <main>
+      <slot />
+    </main>
+    <footer>
+      <p>Built by Nerdy Layers 3D · from Obsidian vault data</p>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* Nerdy Layers 3D palette */
+    --bg: #1f1b2e;           /* deep navy-purple from logo background */
+    --bg-deep: #161220;      /* even darker for image frames */
+    --surface: #2a2540;      /* card / nav surface */
+    --surface-hover: #352e50;
+    --border: #3d3656;
+    --text: #f4ede0;         /* warm off-white (matches logo highlights) */
+    --text-muted: #a39db8;
+    --accent: #f4a44a;       /* amber/orange — primary logo top color */
+    --accent-shadow: #e85c2c; /* orange shadow tone */
+    --secondary: #7dcce8;    /* sky-blue from logo */
+    --secondary-shadow: #4ea3c5;
+    --link: #7dcce8;
+    --link-hover: #f4a44a;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top, rgba(244, 164, 74, 0.06), transparent 60%),
+      radial-gradient(ellipse at bottom, rgba(125, 204, 232, 0.04), transparent 60%),
+      var(--bg);
+    min-height: 100vh;
+  }
+
+  a {
+    color: var(--link);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  a:hover {
+    color: var(--link-hover);
+    text-decoration: underline;
+  }
+
+  nav {
+    padding: 1rem 2rem;
+    border-bottom: 2px solid var(--accent);
+    background: var(--surface);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3);
+  }
+
+  .nav-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: "Fredoka", "Inter", sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    text-shadow: 1px 2px 0 var(--accent-shadow);
+  }
+
+  .nav-brand:hover {
+    text-decoration: none;
+    color: var(--secondary);
+    text-shadow: 1px 2px 0 var(--secondary-shadow);
+  }
+
+  .nav-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 0;
+    object-fit: cover;
+  }
+
+  .nav-text {
+    line-height: 1;
+  }
+
+  main {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+  }
+
+  footer {
+    max-width: 1100px;
+    margin: 4rem auto 2rem;
+    padding: 1.25rem 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: "Fredoka", "Inter", sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 2px 3px 0 var(--accent-shadow);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.01em;
+  }
+
+  h2 {
+    font-family: "Fredoka", "Inter", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 2rem 0 0.75rem;
+    color: var(--secondary);
+  }
+
+  h3 {
+    font-family: "Fredoka", "Inter", sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--text);
+  }
+
+  p {
+    margin-bottom: 0.75rem;
+  }
+
+  ul, ol {
+    margin-left: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  li {
+    margin-bottom: 0.25rem;
+  }
+
+  strong {
+    color: var(--accent);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+</style>

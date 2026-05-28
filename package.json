@@ -1,0 +1,19 @@
+{
+  "name": "website",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "sync": "bash scripts/sync-content.sh",
+    "dev": "bash scripts/sync-content.sh && astro dev",
+    "build": "bash scripts/sync-content.sh && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^6.1.6",
+    "unist-util-visit": "^5.1.0"
+  }
+}
