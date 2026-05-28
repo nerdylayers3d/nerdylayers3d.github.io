@@ -188,7 +188,7 @@ const specs = [
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1.1rem;
     margin-bottom: 2rem;
   }
 
@@ -201,6 +201,7 @@ const specs = [
   .specs-table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
   }
 
   .specs-table tr {
@@ -213,23 +214,52 @@ const specs = [
 
   .specs-table td {
     padding: 0.5rem 0;
+    vertical-align: top;
+    overflow-wrap: anywhere;
   }
 
   .spec-label {
     color: var(--text-muted);
-    width: 40%;
-    font-size: 0.9rem;
+    width: 38%;
+    font-size: 0.85rem;
+    padding-right: 0.75rem;
   }
 
   .spec-value {
     font-weight: 500;
+    font-size: 0.9rem;
   }
 
   .content-section {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 1.5rem 2rem;
+    padding: 1.1rem;
+    overflow-wrap: anywhere;
+  }
+
+  .content-section :global(img) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .content-section :global(table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    font-size: 0.85rem;
+  }
+
+  .content-section :global(pre) {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .specs-section { padding: 1.5rem; }
+    .content-section { padding: 1.5rem 2rem; }
+    .spec-label { width: 35%; font-size: 0.9rem; }
+    .spec-value { font-size: 1rem; }
   }
 
   .content-section :global(hr) {

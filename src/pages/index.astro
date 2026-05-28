@@ -94,8 +94,15 @@ const sortedRobots = [...robots].sort((a, b) => {
 
   .robot-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .robot-grid {
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
   }
 
   .robot-card {
@@ -139,10 +146,6 @@ const sortedRobots = [...robots].sort((a, b) => {
     font-size: 3rem;
     font-weight: 700;
     letter-spacing: 0.05em;
-  }
-
-  .card-body {
-    padding: 1.25rem 1.5rem 1.5rem;
   }
 
   .card-header {
@@ -239,15 +242,32 @@ const sortedRobots = [...robots].sort((a, b) => {
   .spec-row {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
     font-size: 0.85rem;
-    padding: 0.2rem 0;
+    padding: 0.25rem 0;
   }
 
   .spec-label {
     color: var(--text-muted);
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .spec-value {
     font-weight: 500;
+    text-align: right;
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  .card-body {
+    padding: 1rem 1.1rem 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .card-body {
+      padding: 1.25rem 1.5rem 1.5rem;
+    }
   }
 </style>
