@@ -1,5 +1,5 @@
 # Cloudflare Worker configuration — serves the static Astro build as edge-hosted assets.
-name = "nerdylayers3d"
+name = "nerdy-layers-3d"
 compatibility_date = "2025-01-01"
 
 # Serve the contents of dist/ (Astro build output) as static assets.
