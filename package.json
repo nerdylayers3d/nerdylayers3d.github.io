@@ -1,7 +1,7 @@
 {
-  "name": "website",
+  "name": "nerdylayers3d",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "node": ">=22.12.0"
   },
@@ -10,10 +10,14 @@
     "dev": "bash scripts/sync-content.sh && astro dev",
     "build": "bash scripts/sync-content.sh && astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
     "astro": "^6.1.6",
     "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
   }
 }

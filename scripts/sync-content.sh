@@ -12,6 +12,14 @@ ROBOTS_DEST="$WEBSITE_ROOT/src/content/robots"
 COMPONENTS_DEST="$WEBSITE_ROOT/src/content/components"
 ASSETS_DEST="$WEBSITE_ROOT/public/assets"
 
+# This script syncs Markdown + images from a local Obsidian vault into the Astro
+# content collections. It's a developer tool — in CI (Cloudflare Workers builds, etc.)
+# the vault is absent; skip and use the content already checked in.
+if [ ! -d "$ROBOTS_SRC" ]; then
+  echo "sync-content: Robotics/ not found at $ROBOTS_SRC — skipping sync (using checked-in content)."
+  exit 0
+fi
+
 # Folders under Robotics/ that are NOT robots (leagues, events, etc.) — skipped in sync
 SKIP_FOLDERS=("PLA-League")
 
