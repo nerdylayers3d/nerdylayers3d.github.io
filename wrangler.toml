@@ -1,0 +1,10 @@
+# Cloudflare Worker configuration — serves the static Astro build as edge-hosted assets.
+name = "nerdy-layers-3d"
+compatibility_date = "2025-01-01"
+
+# Serve the contents of dist/ (Astro build output) as static assets.
+# The Worker has no fetch handler — Cloudflare routes all requests through the
+# static-assets binding, which handles SPA-style fallthrough and 404s.
+[assets]
+directory = "./dist"
+not_found_handling = "404-page"
