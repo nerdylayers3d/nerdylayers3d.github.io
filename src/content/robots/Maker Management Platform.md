@@ -22,6 +22,15 @@ Self-hosted 3D-printing **project library + repository manager**. Lets you keep 
 
 Built across ~2 years (Nov 2023 → Nov 2025), then archived. The pieces still work as standalone references; the codebase is no longer maintained.
 
+<div class="youtube-embed">
+  <iframe
+    src="https://www.youtube.com/embed/10bNQj1ux8Y"
+    title="MMP demo on YouTube"
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen></iframe>
+</div>
+
 ---
 
 ## Component repositories

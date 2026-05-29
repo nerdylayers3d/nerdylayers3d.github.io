@@ -21,7 +21,9 @@ const weightDisplay = data.weight
   ? `${data.weight}g`
   : data.target_weight
     ? `${data.target_weight}g (target)`
-    : undefined;
+    : data.weight_note
+      ? data.weight_note
+      : undefined;
 
 const specs = [
   { label: "Status", value: data.status },
@@ -50,245 +52,217 @@ const specs = [
   { label: "Wedge", value: data.wedge_specs },
   { label: "Receiver", value: data.receiver, link: resolveWikiLink(data.receiver) },
 ].filter((s) => s.value);
+
+const statusBadgeClass = (status: string | undefined) => {
+  if (!status) return "";
+  if (status === "discontinued" || status === "retired") return "badge-orange-outline";
+  return "badge-sky";
+};
 ---
 
-<BaseLayout title={name}>
-  <a href="/" class="back-link">&larr; All Projects</a>
+<BaseLayout
+  title={`${name} — Nerdy Layers 3D`}
+  description={data.concept || `${name} — a Nerdy Layers 3D project.`}
+  image={data.cover}
+>
+  <div>
+    <a href="/" class="mb-6 inline-block text-sm" style="color: var(--color-muted);">
+      ← All Projects
+    </a>
 
-  <div class="robot-header">
-    <div>
-      <div class="badges">
-        <span class="category-badge">{data.category || "robot"}</span>
-        {data.status && <span class={`status-badge status-${data.status}`}>{data.status}</span>}
+    <header class="mb-8">
+      <div class="mb-3 flex flex-wrap items-center gap-2">
+        <span class="badge badge-amber">{data.category || "robot"}</span>
+        {data.status && (
+          <span class={`badge ${statusBadgeClass(data.status)}`}>{data.status}</span>
+        )}
       </div>
-      <h1>{name}</h1>
-      {data.concept && <p class="concept">{data.concept}</p>}
+      <h1 class="brand-heading text-4xl sm:text-5xl md:text-6xl">{name}</h1>
+      {data.concept && (
+        <p class="mt-2 text-lg italic" style="color: var(--color-muted);">
+          {data.concept}
+        </p>
+      )}
       {data.status === "discontinued" && data.discontinued_after && (
-        <p class="discontinued-note">
-          Retired after <strong>{data.discontinued_after}</strong>
-          {data.discontinued_date && <> ({data.discontinued_date})</>}
+        <p
+          class="mt-3 rounded border-l-4 px-3 py-2 text-sm"
+          style="background: rgba(232,92,44,0.08); border-color: var(--color-accent-shadow); color: var(--color-muted);"
+        >
+          Retired after <strong style="color: var(--color-accent);">{data.discontinued_after}</strong>
+          {data.discontinued_date && <span> ({data.discontinued_date})</span>}
           {data.successor && resolveRobotLink(data.successor) && (
-            <> — succeeded by <a href={resolveRobotLink(data.successor)!.href}>{resolveRobotLink(data.successor)!.name}</a></>
+            <> — succeeded by <a href={resolveRobotLink(data.successor)!.href} class="underline">{resolveRobotLink(data.successor)!.name}</a></>
           )}
         </p>
       )}
-      <p class="external-links">
-        {data.cad && (
-          <a href={data.cad} target="_blank" rel="noopener noreferrer">View CAD in Onshape →</a>
-        )}
-        {data.photos && (
-          <a href={data.photos} target="_blank" rel="noopener noreferrer">Photo album →</a>
-        )}
-      </p>
-    </div>
-  </div>
+      {(data.cad || data.photos) && (
+        <p class="mt-3 flex flex-wrap gap-5 text-sm">
+          {data.cad && (
+            <a href={data.cad} target="_blank" rel="noopener noreferrer" style="color: var(--color-link);">
+              View CAD in Onshape →
+            </a>
+          )}
+          {data.photos && (
+            <a href={data.photos} target="_blank" rel="noopener noreferrer" style="color: var(--color-link);">
+              Photo album →
+            </a>
+          )}
+        </p>
+      )}
+    </header>
 
-  <section class="specs-section">
-    <h2>Specifications</h2>
-    <table class="specs-table">
-      <tbody>
-        {specs.map((spec) => (
-          <tr>
-            <td class="spec-label">{spec.label}</td>
-            <td class="spec-value">
+    <section
+      class="mb-8 rounded-lg border p-5 sm:p-6"
+      style="background: var(--color-surface); border-color: var(--color-border);"
+    >
+      <h2 class="brand-heading-sky mb-4 text-xl">Specifications</h2>
+      <dl class="divide-y" style="--tw-divide-opacity:1; border-color: var(--color-border);">
+        {specs.map((spec, i) => (
+          <div class={`grid grid-cols-[35%_1fr] gap-3 py-2 ${i > 0 ? 'border-t' : ''}`} style="border-color: var(--color-border);">
+            <dt class="text-sm" style="color: var(--color-muted);">{spec.label}</dt>
+            <dd class="text-sm font-medium sm:text-base" style="overflow-wrap: anywhere;">
               {spec.link ? (
-                <a href={spec.link.href}>{spec.link.name}</a>
+                <a href={spec.link.href} style="color: var(--color-link);">{spec.link.name}</a>
               ) : (
                 displayValue(spec.value!)
               )}
-            </td>
-          </tr>
+            </dd>
+          </div>
         ))}
-      </tbody>
-    </table>
-  </section>
+      </dl>
+    </section>
 
-  {data.cad && (
-    <section class="cad-embed-section">
-      <h2>Live CAD model</h2>
-      <p class="cad-embed-hint">
-        Interactive Onshape viewer below. If you can't see the model, you may need to be logged in to Onshape, or
-        <a href={data.cad} target="_blank" rel="noopener noreferrer">open it in a new tab</a>.
-      </p>
-      <div class="cad-embed-frame">
-        <iframe
-          src={data.cad}
-          title={`${name} — CAD`}
-          loading="lazy"
-          allow="fullscreen"
-          referrerpolicy="no-referrer-when-downgrade"
-        />
+    <section
+      class="rounded-lg border p-5 sm:p-8"
+      style="background: var(--color-surface); border-color: var(--color-border);"
+    >
+      <div class="prose-content">
+        <Content />
       </div>
     </section>
-  )}
-
-  <section class="content-section">
-    <Content />
-  </section>
+  </div>
 </BaseLayout>
 
-<style>
-  .back-link {
-    display: inline-block;
-    margin-bottom: 1.5rem;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-  }
-
-  .back-link:hover {
-    color: var(--link);
-  }
-
-  .robot-header {
-    margin-bottom: 2rem;
-  }
-
-  .badges {
-    display: flex;
-    gap: 0.4rem;
-    margin-bottom: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  .category-badge {
-    display: inline-block;
-    background: var(--accent);
-    color: var(--bg);
-    padding: 0.2rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    box-shadow: 0 2px 0 var(--accent-shadow);
-  }
-
-  .status-badge {
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .status-in-development,
-  .status-active {
-    background: var(--secondary);
-    color: var(--bg);
-    box-shadow: 0 2px 0 var(--secondary-shadow);
-  }
-
-  .status-discontinued, .status-retired {
-    background: rgba(232, 92, 44, 0.25);
-    color: #f4a48a;
-    border: 1px solid rgba(232, 92, 44, 0.4);
-  }
-
-  .discontinued-note {
-    margin-top: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: rgba(74, 45, 45, 0.4);
-    border-left: 3px solid #e3b6b6;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-  }
-
-  .external-links {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    display: flex;
-    gap: 1.25rem;
-    flex-wrap: wrap;
-  }
-
-  .external-links:empty {
-    display: none;
-  }
-
-  .concept {
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: 1.1rem;
-  }
-
-  .specs-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.1rem;
-    margin-bottom: 2rem;
-  }
-
-  .specs-section h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-  }
-
-  .specs-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-
-  .specs-table tr {
-    border-bottom: 1px solid var(--border);
-  }
-
-  .specs-table tr:last-child {
-    border-bottom: none;
-  }
-
-  .specs-table td {
-    padding: 0.5rem 0;
-    vertical-align: top;
+<style is:global>
+  /* Styling for markdown content inside .prose-content. Tailwind v4's @apply
+     inside scoped Astro <style> blocks can be finicky, so we use vanilla CSS
+     keyed on a class instead. */
+  .prose-content {
+    color: var(--color-text);
     overflow-wrap: anywhere;
   }
-
-  .spec-label {
-    color: var(--text-muted);
-    width: 38%;
+  .prose-content h2 {
+    font-family: var(--font-display);
+    color: var(--color-secondary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 2rem 0 0.75rem;
+  }
+  .prose-content h3 {
+    font-family: var(--font-display);
+    color: var(--color-text);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.5rem;
+  }
+  .prose-content h4 {
+    font-family: var(--font-display);
+    color: var(--color-text);
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 1.25rem 0 0.4rem;
+  }
+  .prose-content p {
+    margin-bottom: 0.75rem;
+  }
+  .prose-content a {
+    color: var(--color-link);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .prose-content a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+  .prose-content strong {
+    color: var(--color-accent);
+  }
+  .prose-content ul,
+  .prose-content ol {
+    margin: 0.5rem 0 0.75rem 1.25rem;
+  }
+  .prose-content li {
+    margin-bottom: 0.25rem;
+  }
+  .prose-content hr {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 2rem 0;
+  }
+  .prose-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    margin: 1rem 0;
+  }
+  .prose-content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
     font-size: 0.85rem;
-    padding-right: 0.75rem;
+    margin: 1rem 0;
   }
-
-  .spec-value {
-    font-weight: 500;
-    font-size: 0.9rem;
+  .prose-content th,
+  .prose-content td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    text-align: left;
   }
-
-  .cad-embed-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1.1rem;
-    margin-bottom: 2rem;
+  .prose-content th {
+    background: var(--color-bg-deep);
+    color: var(--color-secondary);
   }
-
-  .cad-embed-section h2 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-  }
-
-  .cad-embed-hint {
-    color: var(--text-muted);
+  .prose-content pre {
+    overflow-x: auto;
+    max-width: 100%;
+    background: var(--color-bg-deep);
+    border-radius: 6px;
+    padding: 1rem;
     font-size: 0.85rem;
-    margin-bottom: 1rem;
+    margin: 1rem 0;
+  }
+  .prose-content code {
+    background: var(--color-bg-deep);
+    color: var(--color-secondary);
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+  .prose-content pre code {
+    background: transparent;
+    padding: 0;
+  }
+  .prose-content blockquote {
+    border-left: 3px solid var(--color-secondary);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--color-muted);
+    font-style: italic;
   }
 
-  .cad-embed-frame {
+  /* YouTube embed (used inline in markdown via <div class="youtube-embed">) */
+  .youtube-embed {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 10;
-    background: var(--bg-deep);
-    border-radius: 6px;
+    aspect-ratio: 16 / 9;
+    background: var(--color-bg-deep);
+    border-radius: 8px;
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid var(--color-border);
+    margin: 1.5rem 0;
   }
-
-  .cad-embed-frame iframe {
+  .youtube-embed iframe {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -296,45 +270,66 @@ const specs = [
     border: 0;
   }
 
-  .content-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
+  /* Obsidian callouts (rendered by remark-callouts.mjs) */
+  .callout {
     border-radius: 8px;
-    padding: 1.1rem;
-    overflow-wrap: anywhere;
+    border-left: 4px solid var(--color-muted);
+    background: rgba(58, 50, 86, 0.4);
+    padding: 0.85rem 1rem 0.5rem;
+    margin: 1.25rem 0;
   }
-
-  .content-section :global(img) {
-    max-width: 100%;
-    height: auto;
+  .callout > .callout-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+    color: var(--color-muted);
   }
-
-  .content-section :global(table) {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
-    font-size: 0.85rem;
+  .callout > *:last-child {
+    margin-bottom: 0;
   }
-
-  .content-section :global(pre) {
-    overflow-x: auto;
-    max-width: 100%;
+  .callout-warning,
+  .callout-failure,
+  .callout-danger {
+    border-left-color: var(--color-accent);
+    background: rgba(244, 164, 74, 0.08);
   }
-
-  @media (min-width: 640px) {
-    .specs-section { padding: 1.5rem; }
-    .content-section { padding: 1.5rem 2rem; }
-    .spec-label { width: 35%; font-size: 0.9rem; }
-    .spec-value { font-size: 1rem; }
+  .callout-warning > .callout-title,
+  .callout-failure > .callout-title,
+  .callout-danger > .callout-title {
+    color: var(--color-accent);
   }
-
-  .content-section :global(hr) {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 1.5rem 0;
+  .callout-info,
+  .callout-note,
+  .callout-tip,
+  .callout-abstract,
+  .callout-question {
+    border-left-color: var(--color-secondary);
+    background: rgba(125, 204, 232, 0.08);
   }
-
-  .content-section :global(strong) {
-    color: var(--text);
+  .callout-info > .callout-title,
+  .callout-note > .callout-title,
+  .callout-tip > .callout-title,
+  .callout-abstract > .callout-title,
+  .callout-question > .callout-title {
+    color: var(--color-secondary);
+  }
+  .callout-success {
+    border-left-color: #7dcc9a;
+    background: rgba(125, 204, 154, 0.08);
+  }
+  .callout-success > .callout-title {
+    color: #7dcc9a;
+  }
+  .callout-bug,
+  .callout-important {
+    border-left-color: var(--color-accent-shadow);
+    background: rgba(232, 92, 44, 0.1);
+  }
+  .callout-bug > .callout-title,
+  .callout-important > .callout-title {
+    color: var(--color-accent-shadow);
   }
 </style>

@@ -1,6 +1,6 @@
 ---
 tags:
-  - Robotics/Lucile/Config
+  - Robotics/Lucille/Config
 ---
 
 # EdgeTX Model Profile: Lucille

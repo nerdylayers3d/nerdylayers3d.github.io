@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+/* Nerdy Layers 3D brand tokens — exposed as both Tailwind theme tokens (via
+   @theme) and CSS variables (so existing :root vars keep working during the
+   transition). */
+@theme {
+  --color-bg: #1f1b2e;
+  --color-bg-deep: #161220;
+  --color-surface: #2a2540;
+  --color-surface-hover: #352e50;
+  --color-border: #3d3656;
+  --color-text: #f4ede0;
+  --color-muted: #a39db8;
+  --color-accent: #f4a44a;
+  --color-accent-shadow: #e85c2c;
+  --color-secondary: #7dcce8;
+  --color-secondary-shadow: #4ea3c5;
+  --color-link: #7dcce8;
+
+  --font-display: "Fredoka", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Legacy CSS variables (kept while we migrate the rest of the site to
+   Tailwind utilities). Same values as above. */
+:root {
+  --bg: #1f1b2e;
+  --bg-deep: #161220;
+  --surface: #2a2540;
+  --surface-hover: #352e50;
+  --border: #3d3656;
+  --text: #f4ede0;
+  --text-muted: #a39db8;
+  --accent: #f4a44a;
+  --accent-shadow: #e85c2c;
+  --secondary: #7dcce8;
+  --secondary-shadow: #4ea3c5;
+  --link: #7dcce8;
+  --link-hover: #f4a44a;
+}
+
+/* Base html / body — full width, no constraints anywhere. */
+html,
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at top, rgba(244, 164, 74, 0.06), transparent 60%),
+    radial-gradient(ellipse at bottom, rgba(125, 204, 232, 0.04), transparent 60%),
+    var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* Chunky 3D heading style that echoes the logo extrusion. */
+.brand-heading {
+  font-family: var(--font-display);
+  color: var(--color-accent);
+  text-shadow: 2px 3px 0 var(--color-accent-shadow);
+  letter-spacing: 0.01em;
+  font-weight: 700;
+}
+
+.brand-heading-sky {
+  font-family: var(--font-display);
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+/* Status badge variants */
+.badge {
+  @apply inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider;
+}
+
+.badge-amber {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  box-shadow: 0 2px 0 var(--color-accent-shadow);
+}
+
+.badge-sky {
+  background: var(--color-secondary);
+  color: var(--color-bg);
+  box-shadow: 0 2px 0 var(--color-secondary-shadow);
+}
+
+.badge-orange-outline {
+  background: rgba(232, 92, 44, 0.25);
+  color: #f4a48a;
+  border: 1px solid rgba(232, 92, 44, 0.4);
+}

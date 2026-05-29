@@ -2,7 +2,7 @@
 fileClass: CombatRobot
 robot_name: Lucille MK2
 status: in-development
-predecessor: "[[Lucile]]"
+predecessor: "[[Lucille]]"
 concept: The Walking Dead (Negan's Bat)
 cover: assembly-isometric.png
 weapon_type: Front-mounted Horizontal Drum (Machined Aluminum, Replaceable Teeth)
@@ -26,7 +26,7 @@ cad: https://cad.onshape.com/documents/7384224e9f8d48c6f38a9f45/w/7336d37dc577d2
 ---
 
 > [!info] MK2 — In Development
-> Successor to **[[Lucile|Lucille MK1]]**, retired after Iberanime. MK2 keeps the *Walking Dead* identity and the ELRS control stack but is a ground-up redesign: brushless 4WD with belt-driven wheels, and a much wider front-mounted machined aluminum drum with replaceable teeth.
+> Successor to **[[Lucille|Lucille MK1]]**, retired after Iberanime. MK2 keeps the *Walking Dead* identity and the ELRS control stack but is a ground-up redesign: brushless 4WD with belt-driven wheels, and a much wider front-mounted machined aluminum drum with replaceable teeth.
 
 **Lucille MK2** doubles down on the original "brute force" thesis with a heavier weapon and a more reliable drivetrain. Where MK1 was a small split drum + 2WD geared brushed motors, MK2 is a full-width front drum + 4WD brushless with planetary reduction.
 
@@ -36,9 +36,9 @@ cad: https://cad.onshape.com/documents/7384224e9f8d48c6f38a9f45/w/7336d37dc577d2
 - _TBD_
 
 ### **Visual & Physical Profile**
-![[Robotics/Lucile MK2/_resources/lucille-mk2-cad-isometric.png]]
-![[Robotics/Lucile MK2/_resources/lucille-mk2-cad-top.png]]
-![[Robotics/Lucile MK2/_resources/lucille-mk2-cad-side.png]]
+![[Robotics/Lucille MK2/_resources/lucille-mk2-cad-isometric.png]]
+![[Robotics/Lucille MK2/_resources/lucille-mk2-cad-top.png]]
+![[Robotics/Lucille MK2/_resources/lucille-mk2-cad-side.png]]
 
 #### Multi-view (LucilleMK2 Assembly, rendered from Onshape)
 
@@ -56,13 +56,13 @@ cad: https://cad.onshape.com/documents/7384224e9f8d48c6f38a9f45/w/7336d37dc577d2
 | Left (CAD) | `assembly-left-cad.png` | **Looking at the robot's RIGHT side.** Same wheel layout; cylindrical body poking out upper-left is the **D2830 weapon motor** mounted to this upright. |
 | Trimetric | `assembly-trimetric.png` | Alternative iso angle for layout discussion |
 
-![[Robotics/Lucile MK2/_resources/assembly-isometric.png]]
-![[Robotics/Lucile MK2/_resources/assembly-top.png]]
-![[Robotics/Lucile MK2/_resources/assembly-back-cad.png]]
-![[Robotics/Lucile MK2/_resources/assembly-front-cad.png]]
-![[Robotics/Lucile MK2/_resources/assembly-left-cad.png]]
-![[Robotics/Lucile MK2/_resources/assembly-right-cad.png]]
-![[Robotics/Lucile MK2/_resources/assembly-bottom.png]]
+![[Robotics/Lucille MK2/_resources/assembly-isometric.png]]
+![[Robotics/Lucille MK2/_resources/assembly-top.png]]
+![[Robotics/Lucille MK2/_resources/assembly-back-cad.png]]
+![[Robotics/Lucille MK2/_resources/assembly-front-cad.png]]
+![[Robotics/Lucille MK2/_resources/assembly-left-cad.png]]
+![[Robotics/Lucille MK2/_resources/assembly-right-cad.png]]
+![[Robotics/Lucille MK2/_resources/assembly-bottom.png]]
 
 The MK2 chassis carries the orange/red TPU outer shell language from MK1 but expands to accommodate four wheels and a wide front drum. Layout (from CAD):
 
@@ -89,6 +89,8 @@ The MK2 chassis carries the orange/red TPU outer shell language from MK1 but exp
 MK2 trades MK1's "feed-with-wedge" approach for **direct horizontal drum engagement across the full front**. There's no separate wedge — the drum *is* the front face, spinning at high tip speed. The robot is harder to flank because both sides drive symmetrically, and the planetary gearboxes give meaningfully more pushing torque than the MK1 brushed gearmotors.
 
 Replaceable teeth let MK2 stay competitive across a multi-match event without rebuilding the weapon: damaged teeth swap out in the pit instead of forcing a full drum reprint/remachine.
+
+<!-- internal-start -->
 
 ---
 
@@ -197,11 +199,11 @@ The "9 instances" shown grouped in the UI panel expand into the following actual
 > `#weapBelt` is a `MEASURED` variable: it measures actual geometry in the sketch and writes the result back as a variable, so any change to pulley size or motor position automatically updates the belt length used downstream. Don't hand-edit it — change the pulley/motor geometry instead.
 
 **Onshape screenshots:**
-- ![[Robotics/Lucile MK2/_resources/onshape-lucillemk2-assembly.png]] LucilleMK2 Assembly — full robot view with motor mounted on right upright
-- ![[Robotics/Lucile MK2/_resources/onshape-lucillemk2-partstudio.png]] LucilleMK2 Part Studio in assembly context — chassis bodies + parts list
-- ![[Robotics/Lucile MK2/_resources/onshape-weapon-partstudio.png]] Weapon Part Studio — drum with 2 of 3 teeth visible
-- ![[Robotics/Lucile MK2/_resources/onshape-weapon-assembly.png]] WeaponAssembly — drum + bearings + tooth fasteners
-- ![[Robotics/Lucile MK2/_resources/onshape-chassis-sketch1.png]] Chassis Sketch 1 — side view showing wheel pulleys, drive belt path, weapon belt path
+- ![[Robotics/Lucille MK2/_resources/onshape-lucillemk2-assembly.png]] LucilleMK2 Assembly — full robot view with motor mounted on right upright
+- ![[Robotics/Lucille MK2/_resources/onshape-lucillemk2-partstudio.png]] LucilleMK2 Part Studio in assembly context — chassis bodies + parts list
+- ![[Robotics/Lucille MK2/_resources/onshape-weapon-partstudio.png]] Weapon Part Studio — drum with 2 of 3 teeth visible
+- ![[Robotics/Lucille MK2/_resources/onshape-weapon-assembly.png]] WeaponAssembly — drum + bearings + tooth fasteners
+- ![[Robotics/Lucille MK2/_resources/onshape-chassis-sketch1.png]] Chassis Sketch 1 — side view showing wheel pulleys, drive belt path, weapon belt path
 
 ---
 
@@ -248,3 +250,5 @@ The "9 instances" shown grouped in the UI panel expand into the following actual
 - [ ] First event target (TBD)
 - [ ] Spare drum + spare tooth set in pit kit
 - [ ] Verify final weight ≤ 1500g (Portuguese Beetleweight)
+
+<!-- internal-end -->

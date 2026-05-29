@@ -5,8 +5,6 @@ import { displayValue } from "../lib/utils";
 
 const allProjects = await getCollection("robots");
 
-// Show projects tagged "robots" or "software" (the two current types).
-// Entries with no tags are included as legacy (treated as robots).
 const PROJECT_TAGS = new Set(["robots", "software"]);
 const projects = allProjects.filter((p) => {
   const tags = p.data.tags;
@@ -17,8 +15,9 @@ const projects = allProjects.filter((p) => {
 const statusOrder: Record<string, number> = {
   "in-development": 0,
   active: 1,
-  retired: 2,
-  discontinued: 3,
+  research: 2,
+  retired: 3,
+  discontinued: 4,
 };
 
 const sortedRobots = [...projects].sort((a, b) => {
@@ -27,256 +26,130 @@ const sortedRobots = [...projects].sort((a, b) => {
   if (sa !== sb) return sa - sb;
   return (a.data.robot_name || a.id).localeCompare(b.data.robot_name || b.id);
 });
+
+const statusBadgeClass = (status: string | undefined) => {
+  if (!status) return "";
+  if (status === "discontinued" || status === "retired") return "badge-orange-outline";
+  return "badge-sky";
+};
 ---
 
-<BaseLayout title="Nerdy Layers">
-  <h1>Projects</h1>
-  <p class="subtitle">Combat robotics builds, 3D-printed mechanisms, and electronics tinkering by Nerdy Layers 3D.</p>
+<BaseLayout
+  title="Nerdy Layers 3D"
+  description="Combat robotics builds, 3D-printed mechanisms, and electronics tinkering by Nerdy Layers 3D."
+>
+  <header class="mb-8">
+    <h1 class="brand-heading text-4xl sm:text-5xl md:text-6xl">Projects</h1>
+    <p class="mt-2 text-base sm:text-lg" style="color: var(--color-muted);">
+      Combat robotics builds, 3D-printed mechanisms, and electronics tinkering by Nerdy Layers 3D.
+    </p>
+  </header>
 
-  <div class="robot-grid">
-    {sortedRobots.map((robot) => (
-      <a href={`/robots/${robot.id}`} class={`robot-card ${robot.data.status === "discontinued" ? "is-discontinued" : ""}`}>
-        {robot.data.cover ? (
-          <div class="card-cover">
-            <img src={`/assets/${robot.data.cover}`} alt={`${robot.data.robot_name || robot.id} cover`} loading="lazy" />
-          </div>
-        ) : (
-          <div class="card-cover card-cover-placeholder">
-            <span>{(robot.data.robot_name || robot.id).slice(0, 1).toUpperCase()}</span>
-          </div>
-        )}
-        <div class="card-body">
-        <div class="card-header">
-          <span class="category-badge">{robot.data.category || "robot"}</span>
-          {robot.data.status && (
-            <span class={`status-badge status-${robot.data.status}`}>{robot.data.status}</span>
-          )}
-          {(robot.data.weight || robot.data.target_weight) && (
-            <span class="weight">
-              {robot.data.weight ? `${robot.data.weight}g` : `~${robot.data.target_weight}g`}
-            </span>
-          )}
-        </div>
-        <h2>{robot.data.robot_name || robot.id}</h2>
-        {robot.data.concept && <p class="concept">{robot.data.concept}</p>}
-        <div class="card-specs">
-          {robot.data.weapon_type && (
-            <div class="spec-row">
-              <span class="spec-label">Weapon</span>
-              <span class="spec-value">{robot.data.weapon_type}</span>
-            </div>
-          )}
-          {robot.data.weapon_motor && (
-            <div class="spec-row">
-              <span class="spec-label">Weapon Motor</span>
-              <span class="spec-value">{robot.data.weapon_motor}</span>
-            </div>
-          )}
-          {robot.data.drive_motors && (
-            <div class="spec-row">
-              <span class="spec-label">Drive</span>
-              <span class="spec-value">{displayValue(robot.data.drive_motors)}</span>
-            </div>
-          )}
-          {(robot.data.predecessor || robot.data.successor) && (
-            <div class="spec-row lineage">
-              {robot.data.predecessor && (
-                <span class="spec-value">← {displayValue(robot.data.predecessor)}</span>
-              )}
-              {robot.data.successor && (
-                <span class="spec-value">{displayValue(robot.data.successor)} →</span>
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    {
+      sortedRobots.map((robot) => {
+        const name = robot.data.robot_name || robot.id;
+        const weight = robot.data.weight
+          ? `${robot.data.weight}g`
+          : robot.data.target_weight
+            ? `~${robot.data.target_weight}g`
+            : null;
+        const isDiscontinued =
+          robot.data.status === "discontinued" || robot.data.status === "retired";
+        return (
+          <a
+            href={`/robots/${robot.id}`}
+            class={`group block overflow-hidden rounded-xl border transition-colors hover:[border-color:var(--color-accent)] ${
+              isDiscontinued ? "opacity-65 hover:opacity-100" : ""
+            }`}
+            style="background: var(--color-surface); border-color: var(--color-border);"
+          >
+            <div
+              class="aspect-[16/10] w-full overflow-hidden border-b"
+              style="background: var(--color-bg-deep); border-color: var(--color-border);"
+            >
+              {robot.data.cover ? (
+                <img
+                  src={`/assets/${robot.data.cover}`}
+                  alt={`${name} cover`}
+                  loading="lazy"
+                  class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                />
+              ) : (
+                <div class="flex h-full w-full items-center justify-center text-5xl font-bold" style="color: var(--color-muted); font-family: var(--font-display);">
+                  {name.slice(0, 1).toUpperCase()}
+                </div>
               )}
             </div>
-          )}
-        </div>
-        </div>
-      </a>
-    ))}
+
+            <div class="p-4 sm:p-5">
+              <div class="mb-3 flex flex-wrap items-center gap-2">
+                <span class="badge badge-amber">{robot.data.category || "robot"}</span>
+                {robot.data.status && (
+                  <span class={`badge ${statusBadgeClass(robot.data.status)}`}>
+                    {robot.data.status}
+                  </span>
+                )}
+                {weight && (
+                  <span class="ml-auto text-sm font-semibold" style="color: var(--color-muted);">
+                    {weight}
+                  </span>
+                )}
+              </div>
+
+              <h2 class="brand-heading mb-1 text-xl">{name}</h2>
+              {robot.data.concept && (
+                <p class="mb-3 text-sm italic" style="color: var(--color-muted);">
+                  {robot.data.concept}
+                </p>
+              )}
+
+              {robot.data.concept && <div class="my-3 border-t" style="border-color: var(--color-border);" />}
+
+              <dl class="space-y-1.5 text-sm">
+                {robot.data.weapon_type && (
+                  <div class="flex items-baseline gap-3">
+                    <dt class="shrink-0 whitespace-nowrap" style="color: var(--color-muted);">Weapon</dt>
+                    <dd class="ml-auto text-right font-medium" style="overflow-wrap: anywhere;">
+                      {robot.data.weapon_type}
+                    </dd>
+                  </div>
+                )}
+                {robot.data.weapon_motor && (
+                  <div class="flex items-baseline gap-3">
+                    <dt class="shrink-0 whitespace-nowrap" style="color: var(--color-muted);">Motor</dt>
+                    <dd class="ml-auto text-right font-medium" style="overflow-wrap: anywhere;">
+                      {robot.data.weapon_motor}
+                    </dd>
+                  </div>
+                )}
+                {robot.data.drive_motors && (
+                  <div class="flex items-baseline gap-3">
+                    <dt class="shrink-0 whitespace-nowrap" style="color: var(--color-muted);">Drive</dt>
+                    <dd class="ml-auto text-right font-medium" style="overflow-wrap: anywhere;">
+                      {displayValue(robot.data.drive_motors)}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+
+              {(robot.data.predecessor || robot.data.successor) && (
+                <div
+                  class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-2 text-xs italic"
+                  style="color: var(--color-muted); border-color: var(--color-border); border-style: dashed;"
+                >
+                  {robot.data.predecessor && (
+                    <span>← {displayValue(robot.data.predecessor)}</span>
+                  )}
+                  {robot.data.successor && (
+                    <span>{displayValue(robot.data.successor)} →</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </a>
+        );
+      })
+    }
   </div>
 </BaseLayout>
-
-<style>
-  .subtitle {
-    color: var(--text-muted);
-    margin-bottom: 2rem;
-  }
-
-  .robot-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
-  @media (min-width: 640px) {
-    .robot-grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-  }
-
-  .robot-card {
-    display: block;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    color: var(--text);
-    transition: border-color 0.2s, background 0.2s;
-  }
-
-  .robot-card:hover {
-    border-color: var(--accent);
-    background: var(--surface-hover);
-    text-decoration: none;
-  }
-
-  .card-cover {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    background: #050505;
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-  }
-
-  .card-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-    border-radius: 0;
-    display: block;
-  }
-
-  .card-cover-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    font-size: 3rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-  }
-
-  .card-header {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 0.4rem;
-    margin-bottom: 0.75rem;
-    flex-wrap: wrap;
-  }
-
-  .category-badge {
-    background: var(--accent);
-    color: var(--bg);
-    padding: 0.2rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    box-shadow: 0 2px 0 var(--accent-shadow);
-  }
-
-  .status-badge {
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  .status-in-development {
-    background: var(--secondary);
-    color: var(--bg);
-    box-shadow: 0 2px 0 var(--secondary-shadow);
-  }
-
-  .status-active {
-    background: var(--secondary);
-    color: var(--bg);
-    box-shadow: 0 2px 0 var(--secondary-shadow);
-  }
-
-  .status-discontinued, .status-retired {
-    background: rgba(232, 92, 44, 0.25);
-    color: #f4a48a;
-    border: 1px solid rgba(232, 92, 44, 0.4);
-  }
-
-  .is-discontinued {
-    opacity: 0.65;
-  }
-
-  .is-discontinued:hover {
-    opacity: 1;
-  }
-
-  .lineage {
-    margin-top: 0.4rem;
-    padding-top: 0.4rem;
-    border-top: 1px dashed var(--border);
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: 0.8rem;
-    justify-content: space-between;
-  }
-
-  .weight {
-    margin-left: auto;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    font-weight: 600;
-  }
-
-
-  .robot-card h2 {
-    font-size: 1.4rem;
-    margin: 0 0 0.25rem;
-  }
-
-  .concept {
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-  }
-
-  .card-specs {
-    border-top: 1px solid var(--border);
-    padding-top: 0.75rem;
-  }
-
-  .spec-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.75rem;
-    font-size: 0.85rem;
-    padding: 0.25rem 0;
-  }
-
-  .spec-label {
-    color: var(--text-muted);
-    flex: 0 0 auto;
-    white-space: nowrap;
-  }
-
-  .spec-value {
-    font-weight: 500;
-    text-align: right;
-    overflow-wrap: anywhere;
-    min-width: 0;
-  }
-
-  .card-body {
-    padding: 1rem 1.1rem 1.25rem;
-  }
-
-  @media (min-width: 640px) {
-    .card-body {
-      padding: 1.25rem 1.5rem 1.5rem;
-    }
-  }
-</style>

@@ -1,7 +1,7 @@
 ---
 tags:
   - Robotics/Event
-  - Robotics/Lucile
+  - Robotics/Lucille
 event_date: 2026-XX-XX
 location: Oeiras, Portugal
 ---
@@ -56,4 +56,4 @@ This document tracks the preparation for **Lucille**'s appearance at the Oeiras 
 - [ ] Plan "The Reveal" shot for Instagram/Facebook.
 
 ---
-**Back to:** [[Lucile]]
+**Back to:** [[Lucille]]

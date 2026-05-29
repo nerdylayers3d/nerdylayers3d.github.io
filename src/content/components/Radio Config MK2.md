@@ -1,6 +1,6 @@
 ---
 tags:
-  - Robotics/Lucile MK2/Config
+  - Robotics/Lucille MK2/Config
 ---
 
 # EdgeTX Model Profile: Lucille MK2
@@ -70,4 +70,4 @@ Same as MK1 — copy the settings from [[Radio Config]] when first binding the E
 *   **Special Function:** `SF1`: `IF !L02`, `Override CH3`, `-100` (Safety cutoff: weapon cannot spin unless stick is at zero AND arming is active).
 
 ---
-**Back to:** [[Lucile MK2]]
+**Back to:** [[Lucille MK2]]

@@ -1,8 +1,24 @@
+/**
+ * Slugify a name to match Astro's content-collection ID slugifier.
+ * Astro drops punctuation (`.`, `(`, `)`, `,`, etc.) entirely rather than
+ * replacing it with a separator; it then collapses whitespace and remaining
+ * non-alphanumerics to single hyphens.
+ *
+ * Examples (matching Astro's output):
+ *   "ER6 2.4GHz ELRS PWM Receiver" -> "er6-24ghz-elrs-pwm-receiver"
+ *   "Battery 11.1V 850mAh"        -> "battery-111v-850mah"
+ *   "Foo (12V 400RPM) Bar"        -> "foo-12v-400rpm-bar"
+ */
 export function slugify(name: string): string {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "");
+    // Drop punctuation that Astro treats as removable (no separator).
+    .replace(/[.,()'"`!?:;@#$%^&*+=<>{}\[\]\\|]/g, "")
+    // Replace each remaining non-alphanumeric char with a single hyphen.
+    // Note: NOT collapsing runs — Astro emits one hyphen per separator char,
+    // so "foo  bar" (two spaces) becomes "foo--bar", not "foo-bar".
+    .replace(/[^a-z0-9]/g, "-")
+    .replace(/(^-+|-+$)/g, "");
 }
 
 export interface ResolvedLink {

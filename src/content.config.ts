@@ -11,6 +11,7 @@ const robots = defineCollection({
     category: z.string().optional(),
     weight: z.string().optional(),
     target_weight: z.string().optional(),
+    weight_note: z.string().optional(),
     status: z.string().optional(),
     discontinued_date: z.union([z.string(), z.date()]).transform((v) => {
       if (v instanceof Date) return v.toISOString().slice(0, 10);

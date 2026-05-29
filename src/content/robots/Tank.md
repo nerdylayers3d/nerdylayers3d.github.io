@@ -12,7 +12,7 @@ track_type: 3D-printed segmented tracks with sprocket drive (16 segment variants
 bearings: 6x 688ZZ (8x16x5 mm sealed deep-groove)
 fasteners: 17x M5x50 socket head, 2x M5 thin nuts, 1x M8x80 + M8 nut (track tensioner?), 1x M3x6 countersunk
 peg_fit_variable: "#base = 8 mm (peg/hole base diameter, with ±0.1/0.2/0.3 mm clearance variants for press-fit tuning)"
-target_weight: TBD (CAD mass-properties report ~214 g, but many parts likely lack assigned material density)
+weight_note: "TBD — CAD mass-properties reports ~214 g but most parts lack assigned material density"
 ---
 
 **Tank** is a tracked combat platform — currently a research / video project rather than an active competition build. The CAD shows a low-slung wedge-fronted tracked vehicle with **3D-printed segmented tracks**, a brushed gear motor for drive, and a parametric peg-and-hole snap-fit system used throughout the chassis. The work in this Onshape doc spans several years of iteration (multiple Part Studios named `Part Studio 1`–`12`, several Assembly attempts, and a `tank main old` tab) — what's documented here is the **`tank main assembly Copy 1`** tab, which is the most current state.
@@ -56,7 +56,7 @@ The project is currently shelved at the prototype stage; the main outputs are th
 
 #### Layout observations (from CAD only)
 
-- **Wedge-shaped ends on both front and rear** — the chassis tapers down at both ends to give some self-righting / climbing geometry, similar in spirit to Lucile's front wedge but applied symmetrically.
+- **Wedge-shaped ends on both front and rear** — the chassis tapers down at both ends to give some self-righting / climbing geometry, similar in spirit to Lucille's front wedge but applied symmetrically.
 - **Only one side appears driven** in the current assembly: the sprocket + track cluster is visible on only one side in the side views. This may be a CAD-state thing (mirror not applied or second side suppressed) rather than a design decision — needs CAD review.
 - **Modular chassis**: the body is split into **5 transverse rib sections** that bolt together edge-to-edge (visible most clearly in the bottom view). M5x50 socket-head screws are the dominant fastener; the 17x M5x50 in the BOM are the section-to-section joiners.
 - **Battery holder is exposed on top of the deck** as a separate raised block (the `top` + `battery holder` parts from the `batteryHolderTop` studio). Antenna mount sits on top of that.
@@ -72,6 +72,8 @@ The project is currently shelved at the prototype stage; the main outputs are th
 
 > [!note] Control stack
 > Tank uses **ESP32 + dual VNH2SP30 H-bridges** rather than the ELRS/PWM-receiver stack used on the Lucilles. The VNH2SP30 drives the brushed 25GA-370 + TT gear motors directly; the buck converter steps the battery down to logic level for the ESP32. This is an explicitly R&D control choice — the Tank is a platform for trying things that wouldn't be appropriate to risk on a competition robot.
+
+<!-- internal-start -->
 
 ---
 
@@ -260,3 +262,5 @@ That's slow — appropriate for a research / video platform but well below comba
 - [ ] Are the 5 chassis "rib sections" mechanically equivalent (modular, swappable) or each a unique shape?
 - [ ] Is the wedge-front-and-back geometry intended for self-righting, or just for low-profile / climbing?
 - [ ] Does the printed track tolerate combat impacts, or is it strictly a slow-speed research / video prop?
+
+<!-- internal-end -->
