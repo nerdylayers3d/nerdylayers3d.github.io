@@ -7,6 +7,7 @@ discontinued_after: Iberanime
 successor: "[[Lucile MK2]]"
 concept: The Walking Dead (Negan's Bat)
 cover: mk1-assembly-isometric.png
+photos: https://photos.app.goo.gl/uwMD6yo8ADeRi4NT9
 weapon_type: Split Metal-Sleeved Drum
 weapon_mass: 310g
 weapon_hardware: 2x 1.5mm Aluminum Sleeves, Central GT2 Pulley (200-2M-10 belt), 4x M6 Screws (Asymmetric Bite Configuration)
@@ -33,6 +34,9 @@ weight: "1100"
 
 ### **Events**
 - [[Oeiras Gaming 2026]]
+
+### **Photos**
+- [Build & combat album on Google Photos](https://photos.app.goo.gl/uwMD6yo8ADeRi4NT9)
 
 ### **Visual & Physical Profile**
 [[Robotics/Lucile/_resources/f41cbabb7da661a5207849c15a316721_MD5.png|Open: Pasted image 20260504165523.png]]

@@ -9,7 +9,7 @@ const { title } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/png" href="/nerdy-layers-logo.png" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" />
@@ -19,14 +19,22 @@ const { title } = Astro.props;
     <nav>
       <a href="/" class="nav-brand">
         <img src="/nerdy-layers-logo.png" alt="Nerdy Layers 3D" class="nav-logo" />
-        <span class="nav-text">Combat Robots</span>
+        <span class="nav-text">Nerdy Layers</span>
       </a>
     </nav>
     <main>
       <slot />
     </main>
     <footer>
-      <p>Built by Nerdy Layers 3D · from Obsidian vault data</p>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/nerdylayers3d" target="_blank" rel="noopener noreferrer" aria-label="Nerdy Layers 3D on Facebook">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/nerdylayers3d" target="_blank" rel="noopener noreferrer" aria-label="Nerdy Layers 3D on Instagram">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.336 3.608 1.311.975.975 1.249 2.242 1.311 3.608.058 1.266.069 1.646.069 4.85s-.011 3.584-.069 4.85c-.062 1.366-.336 2.633-1.311 3.608-.975.975-2.242 1.249-3.608 1.311-1.266.058-1.646.069-4.85.069s-3.584-.011-4.85-.069c-1.366-.062-2.633-.336-3.608-1.311-.975-.975-1.249-2.242-1.311-3.608C2.175 15.747 2.163 15.368 2.163 12s.012-3.584.07-4.85c.062-1.366.336-2.633 1.311-3.608.975-.975 2.242-1.249 3.608-1.311C8.416 2.175 8.796 2.163 12 2.163zm0 1.802c-3.142 0-3.516.012-4.756.068-1.014.047-1.565.215-1.93.358-.485.188-.832.413-1.196.777-.364.364-.589.711-.777 1.196-.143.366-.311.916-.358 1.93-.056 1.24-.068 1.614-.068 4.756 0 3.142.012 3.516.068 4.756.047 1.014.215 1.565.358 1.93.188.485.413.832.777 1.196.364.364.711.589 1.196.777.366.143.916.311 1.93.358 1.24.056 1.614.068 4.756.068 3.142 0 3.516-.012 4.756-.068 1.014-.047 1.565-.215 1.93-.358.485-.188.832-.413 1.196-.777.364-.364.589-.711.777-1.196.143-.366.311-.916.358-1.93.056-1.24.068-1.614.068-4.756 0-3.142-.012-3.516-.068-4.756-.047-1.014-.215-1.565-.358-1.93-.188-.485-.413-.832-.777-1.196-.364-.364-.711-.589-1.196-.777-.366-.143-.916-.311-1.93-.358-1.24-.056-1.614-.068-4.756-.068zM12 6.865a5.135 5.135 0 100 10.27 5.135 5.135 0 000-10.27zm0 8.468a3.333 3.333 0 110-6.666 3.333 3.333 0 010 6.666zm6.538-8.671a1.2 1.2 0 11-2.4 0 1.2 1.2 0 012.4 0z"/></svg>
+        </a>
+      </div>
+      <p class="footer-brand">Nerdy Layers 3D</p>
     </footer>
   </body>
 </html>
@@ -120,19 +128,47 @@ const { title } = Astro.props;
   }
 
   main {
-    max-width: 1100px;
+    max-width: 1320px;
     margin: 1.25rem auto;
     padding: 0 1rem;
   }
 
   footer {
-    max-width: 1100px;
+    max-width: 1320px;
     margin: 3rem auto 1.5rem;
-    padding: 1rem;
+    padding: 1.25rem 1rem;
     border-top: 1px solid var(--border);
     color: var(--text-muted);
     font-size: 0.85rem;
     text-align: center;
+  }
+
+  .footer-social {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .footer-social a {
+    color: var(--text-muted);
+    transition: color 0.15s, transform 0.15s;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .footer-social a:hover {
+    color: var(--accent);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+
+  .footer-brand {
+    font-family: "Fredoka", "Inter", sans-serif;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin: 0;
   }
 
   h1 {
@@ -195,5 +231,74 @@ const { title } = Astro.props;
 
   table {
     border-collapse: collapse;
+  }
+
+  /* Obsidian-style callouts */
+  .callout {
+    border-radius: 8px;
+    border-left: 4px solid var(--text-muted);
+    background: rgba(58, 50, 86, 0.4);
+    padding: 0.85rem 1rem 0.5rem;
+    margin: 1.25rem 0;
+  }
+
+  .callout > .callout-title {
+    font-family: "Fredoka", "Inter", sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.4rem;
+    color: var(--text-muted);
+  }
+
+  .callout > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .callout-warning,
+  .callout-failure,
+  .callout-danger {
+    border-left-color: #f4a44a;
+    background: rgba(244, 164, 74, 0.08);
+  }
+  .callout-warning > .callout-title,
+  .callout-failure > .callout-title,
+  .callout-danger > .callout-title {
+    color: #f4a44a;
+  }
+
+  .callout-info,
+  .callout-note,
+  .callout-tip,
+  .callout-abstract,
+  .callout-question {
+    border-left-color: var(--secondary);
+    background: rgba(125, 204, 232, 0.08);
+  }
+  .callout-info > .callout-title,
+  .callout-note > .callout-title,
+  .callout-tip > .callout-title,
+  .callout-abstract > .callout-title,
+  .callout-question > .callout-title {
+    color: var(--secondary);
+  }
+
+  .callout-success {
+    border-left-color: #7dcc9a;
+    background: rgba(125, 204, 154, 0.08);
+  }
+  .callout-success > .callout-title {
+    color: #7dcc9a;
+  }
+
+  .callout-bug,
+  .callout-important {
+    border-left-color: #e85c2c;
+    background: rgba(232, 92, 44, 0.1);
+  }
+  .callout-bug > .callout-title,
+  .callout-important > .callout-title {
+    color: #e85c2c;
   }
 </style>

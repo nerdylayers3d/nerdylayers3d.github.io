@@ -1,56 +1,43 @@
-# Nerdy Layers 3D
-
-Combat robotics builds, components, and design documentation.
-
-![Nerdy Layers 3D](public/nerdy-layers-logo.png)
-
-## What's here
-
-A statically-rendered Astro site that catalogues combat robot builds — chassis specs, CAD references, weapon and drive system configurations, and the components that go into each. Content is authored as Markdown (frontmatter + body) and rendered as themed pages.
-
-Current robots:
-- **Lucille MK2** — beetleweight, in development. Brushless 4WD with a front-mounted machined-aluminum drum and replaceable teeth.
-- **Lucille (MK1)** — discontinued after Iberanime. Split metal-sleeved drum, brushed gearmotors, 2mm steel wedge.
-- **Tank** — tracked combat platform (research / video project).
-
-## Stack
-
-- [Astro](https://astro.build) static site generator
-- Content collections + Zod schemas
-- Custom `remark-wiki-links` plugin to handle Obsidian-style `[[Page]]` and `![[image.png]]` syntax
-- Theme palette and Fredoka display font matched to the **Nerdy Layers 3D** brand logo
-
-## Local development
+# Astro Starter Kit: Minimal
 
 ```sh
-npm install
-npm run dev
+npm create astro@latest -- --template minimal
 ```
 
-Site runs at `http://localhost:4321/`.
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
-## Build
+## 🚀 Project Structure
 
-```sh
-npm run build
+Inside of your Astro project, you'll see the following folders and files:
+
+```text
+/
+├── public/
+├── src/
+│   └── pages/
+│       └── index.astro
+└── package.json
 ```
 
-Outputs static HTML to `dist/`.
+Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-## Content sync
+There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
 
-Content originates from an Obsidian vault. The `scripts/sync-content.sh` script copies robot markdown files, components, and image assets into the Astro content collections. The script is **not** part of the deployed site — it's a developer tool.
+Any static assets, like images, can be placed in the `public/` directory.
 
-To regenerate content from the vault (only relevant if you have the vault locally):
+## 🧞 Commands
 
-```sh
-bash scripts/sync-content.sh
-```
+All commands are run from the root of the project, from a terminal:
 
-## Deployment
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `npm install`             | Installs dependencies                            |
+| `npm run dev`             | Starts local dev server at `localhost:4321`      |
+| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run preview`         | Preview your build locally, before deploying     |
+| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `npm run astro -- --help` | Get help using the Astro CLI                     |
 
-This repo is deployed via Cloudflare Pages. Pushes to `main` trigger an automatic build.
+## 👀 Want to learn more?
 
-## License
-
-Content © Nerdy Layers 3D. Code is permissively licensed for reuse.
+Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).

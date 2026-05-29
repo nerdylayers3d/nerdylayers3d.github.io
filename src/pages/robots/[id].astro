@@ -53,7 +53,7 @@ const specs = [
 ---
 
 <BaseLayout title={name}>
-  <a href="/" class="back-link">&larr; All Robots</a>
+  <a href="/" class="back-link">&larr; All Projects</a>
 
   <div class="robot-header">
     <div>
@@ -72,11 +72,14 @@ const specs = [
           )}
         </p>
       )}
-      {data.cad && (
-        <p class="cad-link">
+      <p class="external-links">
+        {data.cad && (
           <a href={data.cad} target="_blank" rel="noopener noreferrer">View CAD in Onshape →</a>
-        </p>
-      )}
+        )}
+        {data.photos && (
+          <a href={data.photos} target="_blank" rel="noopener noreferrer">Photo album →</a>
+        )}
+      </p>
     </div>
   </div>
 
@@ -99,6 +102,25 @@ const specs = [
       </tbody>
     </table>
   </section>
+
+  {data.cad && (
+    <section class="cad-embed-section">
+      <h2>Live CAD model</h2>
+      <p class="cad-embed-hint">
+        Interactive Onshape viewer below. If you can't see the model, you may need to be logged in to Onshape, or
+        <a href={data.cad} target="_blank" rel="noopener noreferrer">open it in a new tab</a>.
+      </p>
+      <div class="cad-embed-frame">
+        <iframe
+          src={data.cad}
+          title={`${name} — CAD`}
+          loading="lazy"
+          allow="fullscreen"
+          referrerpolicy="no-referrer-when-downgrade"
+        />
+      </div>
+    </section>
+  )}
 
   <section class="content-section">
     <Content />
@@ -173,9 +195,16 @@ const specs = [
     color: var(--text-muted);
   }
 
-  .cad-link {
+  .external-links {
     margin-top: 0.5rem;
     font-size: 0.9rem;
+    display: flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  .external-links:empty {
+    display: none;
   }
 
   .concept {
@@ -228,6 +257,43 @@ const specs = [
   .spec-value {
     font-weight: 500;
     font-size: 0.9rem;
+  }
+
+  .cad-embed-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem;
+    margin-bottom: 2rem;
+  }
+
+  .cad-embed-section h2 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .cad-embed-hint {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .cad-embed-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: var(--bg-deep);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .cad-embed-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 
   .content-section {

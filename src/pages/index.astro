@@ -3,7 +3,16 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { displayValue } from "../lib/utils";
 
-const robots = await getCollection("robots");
+const allProjects = await getCollection("robots");
+
+// Show projects tagged "robots" or "software" (the two current types).
+// Entries with no tags are included as legacy (treated as robots).
+const PROJECT_TAGS = new Set(["robots", "software"]);
+const projects = allProjects.filter((p) => {
+  const tags = p.data.tags;
+  if (!tags || tags.length === 0) return true;
+  return tags.some((t) => PROJECT_TAGS.has(t));
+});
 
 const statusOrder: Record<string, number> = {
   "in-development": 0,
@@ -12,7 +21,7 @@ const statusOrder: Record<string, number> = {
   discontinued: 3,
 };
 
-const sortedRobots = [...robots].sort((a, b) => {
+const sortedRobots = [...projects].sort((a, b) => {
   const sa = statusOrder[a.data.status ?? ""] ?? 1;
   const sb = statusOrder[b.data.status ?? ""] ?? 1;
   if (sa !== sb) return sa - sb;
@@ -20,9 +29,9 @@ const sortedRobots = [...robots].sort((a, b) => {
 });
 ---
 
-<BaseLayout title="Combat Robots">
-  <h1>Combat Robots</h1>
-  <p class="subtitle">Beetleweight combat robot builds and components</p>
+<BaseLayout title="Nerdy Layers">
+  <h1>Projects</h1>
+  <p class="subtitle">Combat robotics builds, 3D-printed mechanisms, and electronics tinkering by Nerdy Layers 3D.</p>
 
   <div class="robot-grid">
     {sortedRobots.map((robot) => (
@@ -100,7 +109,7 @@ const sortedRobots = [...robots].sort((a, b) => {
 
   @media (min-width: 640px) {
     .robot-grid {
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 1.5rem;
     }
   }

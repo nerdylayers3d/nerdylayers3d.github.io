@@ -5,20 +5,13 @@ VAULT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 WEBSITE_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 ROBOTS_SRC="$VAULT_ROOT/Robotics"
+SOFTWARE_SRC="$VAULT_ROOT/Software"
 CLIPPINGS_SRC="$VAULT_ROOT/Clippings"
 VAULT_RESOURCES="$VAULT_ROOT/_resources"
 
 ROBOTS_DEST="$WEBSITE_ROOT/src/content/robots"
 COMPONENTS_DEST="$WEBSITE_ROOT/src/content/components"
 ASSETS_DEST="$WEBSITE_ROOT/public/assets"
-
-# This script syncs Markdown + images from a local Obsidian vault into the Astro
-# content collections. It's a developer tool — in CI (Cloudflare Workers builds, etc.)
-# the vault is absent; skip and use the content already checked in.
-if [ ! -d "$ROBOTS_SRC" ]; then
-  echo "sync-content: Robotics/ not found at $ROBOTS_SRC — skipping sync (using checked-in content)."
-  exit 0
-fi
 
 # Folders under Robotics/ that are NOT robots (leagues, events, etc.) — skipped in sync
 SKIP_FOLDERS=("PLA-League")
@@ -55,6 +48,26 @@ for robot_dir in "$ROBOTS_SRC"/*/; do
     fi
   done
 done
+
+# Sync software projects — Software/*.md flat files (one per project).
+# Only files whose frontmatter contains `tags:` including "software" are picked up;
+# other notes in Software/ (e.g. meta-docs about this very site) are skipped.
+# Also sync per-project _resources/ images that live alongside.
+if [ -d "$SOFTWARE_SRC" ]; then
+  for md in "$SOFTWARE_SRC"/*.md; do
+    [ -f "$md" ] || continue
+    if grep -qE '^tags:.*software' "$md" 2>/dev/null \
+       || grep -qE '^\s*-\s*software\s*$' "$md" 2>/dev/null; then
+      cp "$md" "$ROBOTS_DEST/"
+    fi
+  done
+  if [ -d "$SOFTWARE_SRC/_resources" ]; then
+    find "$SOFTWARE_SRC/_resources" -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.gif' -o -name '*.avif' -o -name '*.webp' \) | while read -r img; do
+      fname="$(basename "$img")"
+      cp "$img" "$ASSETS_DEST/$fname"
+    done
+  fi
+fi
 
 # Sync clippings (component pages)
 for md in "$CLIPPINGS_SRC"/*.md; do

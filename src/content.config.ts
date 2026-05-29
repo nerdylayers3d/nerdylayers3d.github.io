@@ -20,6 +20,8 @@ const robots = defineCollection({
     predecessor: z.string().optional(),
     successor: z.string().optional(),
     cad: z.string().optional(),
+    photos: z.string().optional(),
+    tags: z.array(z.string()).optional(),
     weapon_type: z.string().optional(),
     weapon_mass: z.string().optional(),
     weapon_hardware: z.string().optional(),
