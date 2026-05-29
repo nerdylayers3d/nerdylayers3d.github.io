@@ -24,6 +24,23 @@ is_skipped() {
   return 1
 }
 
+# Convert a filename to a lowercase, spaceless slug. Spaces in filenames break
+# Astro's glob loader on Cloudflare's Linux builder, so we normalize at sync
+# time. Mirrors the JS slugify in src/plugins/remark-wiki-links.mjs and
+# src/lib/utils.ts so that [[wikilink]] targets still resolve after rename:
+# punctuation is dropped entirely (no separator), then each remaining
+# non-alphanumeric char becomes a single hyphen (runs are NOT collapsed).
+slugify_filename() {
+  local input="$1"
+  local stem="${input%.md}"
+  local slug
+  slug=$(printf '%s' "$stem" \
+    | tr '[:upper:]' '[:lower:]' \
+    | tr -d '.,()'"'"'"`!?:;@#$%^&*+=<>{}[]\|' \
+    | sed -E 's/[^a-z0-9]/-/g; s/^-+//; s/-+$//')
+  printf '%s.md' "$slug"
+}
+
 # Clean previous sync
 rm -rf "$ROBOTS_DEST" "$COMPONENTS_DEST" "$ASSETS_DEST"
 mkdir -p "$ROBOTS_DEST" "$COMPONENTS_DEST" "$ASSETS_DEST"
@@ -36,7 +53,7 @@ for robot_dir in "$ROBOTS_SRC"/*/; do
   fi
   robot_file="$robot_dir/$robot_name.md"
   if [ -f "$robot_file" ]; then
-    cp "$robot_file" "$ROBOTS_DEST/"
+    cp "$robot_file" "$ROBOTS_DEST/$(slugify_filename "$robot_name.md")"
   fi
 
   # Also copy any bridge/sub-component pages (non-main pages in robot folders)
@@ -44,7 +61,7 @@ for robot_dir in "$ROBOTS_SRC"/*/; do
     [ -f "$md" ] || continue
     fname="$(basename "$md")"
     if [ "$fname" != "$robot_name.md" ]; then
-      cp "$md" "$COMPONENTS_DEST/"
+      cp "$md" "$COMPONENTS_DEST/$(slugify_filename "$fname")"
     fi
   done
 done
@@ -58,7 +75,7 @@ if [ -d "$SOFTWARE_SRC" ]; then
     [ -f "$md" ] || continue
     if grep -qE '^tags:.*software' "$md" 2>/dev/null \
        || grep -qE '^\s*-\s*software\s*$' "$md" 2>/dev/null; then
-      cp "$md" "$ROBOTS_DEST/"
+      cp "$md" "$ROBOTS_DEST/$(slugify_filename "$(basename "$md")")"
     fi
   done
   if [ -d "$SOFTWARE_SRC/_resources" ]; then
@@ -72,7 +89,7 @@ fi
 # Sync clippings (component pages)
 for md in "$CLIPPINGS_SRC"/*.md; do
   [ -f "$md" ] || continue
-  cp "$md" "$COMPONENTS_DEST/"
+  cp "$md" "$COMPONENTS_DEST/$(slugify_filename "$(basename "$md")")"
 done
 
 # Sync images from Clippings/_resources/ (flatten into assets with hash names)
