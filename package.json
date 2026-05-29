@@ -9,12 +9,20 @@
     "sync": "bash scripts/sync-content.sh",
     "dev": "bash scripts/sync-content.sh && astro dev",
     "build": "bash scripts/sync-content.sh && astro build",
-    "preview": "astro preview",
+    "preview": "npm run build && wrangler dev",
     "astro": "astro",
-    "deploy": "bash scripts/deploy.sh"
+    "deploy": "npm run build && wrangler deploy",
+    "generate-types": "wrangler types"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^13.6.0",
     "astro": "^6.1.6",
     "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.95.0"
+  },
+  "overrides": {
+    "vite": "^7"
   }
 }
