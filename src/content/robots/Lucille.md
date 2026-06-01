@@ -1,6 +1,7 @@
 ---
 fileClass: CombatRobot
 robot_name: Lucille
+created: 2026-03-07
 status: discontinued
 discontinued_date: 2026-05-26
 discontinued_after: Iberanime

@@ -1,5 +1,6 @@
 ---
 robot_name: Tank
+created: 2026-01-25
 concept: Tracked combat platform (research / video project)
 category: experimental
 status: research

@@ -5,26 +5,21 @@ import { displayValue } from "../lib/utils";
 
 const allProjects = await getCollection("robots");
 
-const PROJECT_TAGS = new Set(["robots", "software"]);
+const PROJECT_TAGS = new Set(["robots", "software", "print"]);
 const projects = allProjects.filter((p) => {
   const tags = p.data.tags;
   if (!tags || tags.length === 0) return true;
   return tags.some((t) => PROJECT_TAGS.has(t));
 });
 
-const statusOrder: Record<string, number> = {
-  "in-development": 0,
-  active: 1,
-  research: 2,
-  retired: 3,
-  discontinued: 4,
-};
-
+// Newest first. Items without a `created` date sort to the bottom in id order.
 const sortedRobots = [...projects].sort((a, b) => {
-  const sa = statusOrder[a.data.status ?? ""] ?? 1;
-  const sb = statusOrder[b.data.status ?? ""] ?? 1;
-  if (sa !== sb) return sa - sb;
-  return (a.data.robot_name || a.id).localeCompare(b.data.robot_name || b.id);
+  const da = a.data.created ?? "";
+  const db = b.data.created ?? "";
+  if (da && db) return db.localeCompare(da);
+  if (da) return -1;
+  if (db) return 1;
+  return a.id.localeCompare(b.id);
 });
 
 const statusBadgeClass = (status: string | undefined) => {
@@ -54,11 +49,43 @@ const statusBadgeClass = (status: string | undefined) => {
           : robot.data.target_weight
             ? `~${robot.data.target_weight}g`
             : null;
+        const isPrint = robot.data.category === "print";
         const isDiscontinued =
-          robot.data.status === "discontinued" || robot.data.status === "retired";
+          !isPrint && (robot.data.status === "discontinued" || robot.data.status === "retired");
+
+        // For non-print cards, build a short inline metrics strip parallel to
+        // the prints strip below: weight + a one-word weapon class + a terse
+        // drive summary. Each field degrades cleanly if missing.
+        // weapon: pull a recognisable weapon-class keyword from weapon_type
+        // (drum/spinner/hammer/wedge/saw/flipper). If weapon_type just says
+        // "None" we hide the field entirely.
+        let weaponShort: string | null = null;
+        if (robot.data.weapon_type && !/^none/i.test(robot.data.weapon_type)) {
+          const wm = robot.data.weapon_type.match(
+            /\b(drum|spinner|hammer|wedge|saw|flipper|disc|bar|axe|spike)\b/i
+          );
+          weaponShort = wm
+            ? wm[1].charAt(0).toUpperCase() + wm[1].slice(1).toLowerCase()
+            : robot.data.weapon_type.split(/[\s(,]/)[0];
+        }
+        let driveShort: string | null = null;
+        if (robot.data.drive_layout) {
+          const m = robot.data.drive_layout.match(/\b(\d?WD|tracked)\b/i);
+          driveShort = m ? m[1].toUpperCase() : null;
+        }
+        // Prints link out to MakerWorld (or another source) since they have no
+        // dedicated detail page on this site. Everything else opens the local
+        // /robots/<id>/ detail page.
+        const externalHref = robot.data.makerworld_url || robot.data.source_url;
+        const cardHref = isPrint && externalHref
+          ? externalHref
+          : `/robots/${robot.id}`;
+        const isExternal = cardHref.startsWith("http");
         return (
           <a
-            href={`/robots/${robot.id}`}
+            href={cardHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
             class={`group block overflow-hidden rounded-xl border transition-colors hover:[border-color:var(--color-accent)] ${
               isDiscontinued ? "opacity-65 hover:opacity-100" : ""
             }`}
@@ -85,14 +112,9 @@ const statusBadgeClass = (status: string | undefined) => {
             <div class="p-4 sm:p-5">
               <div class="mb-3 flex flex-wrap items-center gap-2">
                 <span class="badge badge-amber">{robot.data.category || "robot"}</span>
-                {robot.data.status && (
+                {robot.data.status && !isPrint && (
                   <span class={`badge ${statusBadgeClass(robot.data.status)}`}>
                     {robot.data.status}
-                  </span>
-                )}
-                {weight && (
-                  <span class="ml-auto text-sm font-semibold" style="color: var(--color-muted);">
-                    {weight}
                   </span>
                 )}
               </div>
@@ -104,34 +126,42 @@ const statusBadgeClass = (status: string | undefined) => {
                 </p>
               )}
 
-              {robot.data.concept && <div class="my-3 border-t" style="border-color: var(--color-border);" />}
+              {robot.data.concept && (isPrint || weight || weaponShort || driveShort) && <div class="my-3 border-t" style="border-color: var(--color-border);" />}
 
-              <dl class="space-y-1.5 text-sm">
-                {robot.data.weapon_type && (
-                  <div class="flex items-baseline gap-3">
-                    <dt class="shrink-0 whitespace-nowrap" style="color: var(--color-muted);">Weapon</dt>
-                    <dd class="ml-auto text-right font-medium" style="overflow-wrap: anywhere;">
-                      {robot.data.weapon_type}
-                    </dd>
-                  </div>
-                )}
-                {robot.data.weapon_motor && (
-                  <div class="flex items-baseline gap-3">
-                    <dt class="shrink-0 whitespace-nowrap" style="color: var(--color-muted);">Motor</dt>
-                    <dd class="ml-auto text-right font-medium" style="overflow-wrap: anywhere;">
-                      {robot.data.weapon_motor}
-                    </dd>
-                  </div>
-                )}
-                {robot.data.drive_motors && (
-                  <div class="flex items-baseline gap-3">
-                    <dt class="shrink-0 whitespace-nowrap" style="color: var(--color-muted);">Drive</dt>
-                    <dd class="ml-auto text-right font-medium" style="overflow-wrap: anywhere;">
-                      {displayValue(robot.data.drive_motors)}
-                    </dd>
-                  </div>
-                )}
-              </dl>
+              {isPrint ? (
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" style="color: var(--color-muted);">
+                  {robot.data.mw_downloads != null && (
+                    <span>⬇ <strong style="color: var(--color-text);">{robot.data.mw_downloads}</strong> dl</span>
+                  )}
+                  {robot.data.mw_prints != null && (
+                    <span>🖨 <strong style="color: var(--color-text);">{robot.data.mw_prints}</strong> prints</span>
+                  )}
+                  {robot.data.mw_likes != null && (
+                    <span>👍 <strong style="color: var(--color-text);">{robot.data.mw_likes}</strong></span>
+                  )}
+                  {robot.data.mw_boosts != null && (
+                    <span>⚡ <strong style="color: var(--color-text);">{robot.data.mw_boosts}</strong></span>
+                  )}
+                  {robot.data.makerworld_url && (
+                    <span class="ml-auto" style="color: var(--color-link);">MakerWorld ↗</span>
+                  )}
+                  {!robot.data.makerworld_url && robot.data.source_url && (
+                    <span class="ml-auto" style="color: var(--color-link);">Instagram ↗</span>
+                  )}
+                </div>
+              ) : (weight || weaponShort || driveShort) && (
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" style="color: var(--color-muted);">
+                  {weight && (
+                    <span>⚖ <strong style="color: var(--color-text);">{weight}</strong></span>
+                  )}
+                  {weaponShort && (
+                    <span>⚡ <strong style="color: var(--color-text);">{weaponShort}</strong></span>
+                  )}
+                  {driveShort && (
+                    <span>⚙ <strong style="color: var(--color-text);">{driveShort}</strong></span>
+                  )}
+                </div>
+              )}
 
               {(robot.data.predecessor || robot.data.successor) && (
                 <div

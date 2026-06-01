@@ -6,6 +6,7 @@ WEBSITE_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 ROBOTS_SRC="$VAULT_ROOT/Robotics"
 SOFTWARE_SRC="$VAULT_ROOT/Software"
+PRINTS_SRC="$VAULT_ROOT/Prints"
 CLIPPINGS_SRC="$VAULT_ROOT/Clippings"
 VAULT_RESOURCES="$VAULT_ROOT/_resources"
 
@@ -80,6 +81,21 @@ if [ -d "$SOFTWARE_SRC" ]; then
   done
   if [ -d "$SOFTWARE_SRC/_resources" ]; then
     find "$SOFTWARE_SRC/_resources" -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.gif' -o -name '*.avif' -o -name '*.webp' \) | while read -r img; do
+      fname="$(basename "$img")"
+      cp "$img" "$ASSETS_DEST/$fname"
+    done
+  fi
+fi
+
+# Sync prints — Prints/*.md flat files (one per 3D print model or commission)
+# plus the shared Prints/_resources/ images.
+if [ -d "$PRINTS_SRC" ]; then
+  for md in "$PRINTS_SRC"/*.md; do
+    [ -f "$md" ] || continue
+    cp "$md" "$ROBOTS_DEST/$(slugify_filename "$(basename "$md")")"
+  done
+  if [ -d "$PRINTS_SRC/_resources" ]; then
+    find "$PRINTS_SRC/_resources" -type f \( -name '*.jpg' -o -name '*.jpeg' -o -name '*.png' -o -name '*.gif' -o -name '*.avif' -o -name '*.webp' \) | while read -r img; do
       fname="$(basename "$img")"
       cp "$img" "$ASSETS_DEST/$fname"
     done

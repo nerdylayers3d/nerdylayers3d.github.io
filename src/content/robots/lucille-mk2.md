@@ -1,6 +1,7 @@
 ---
 fileClass: CombatRobot
 robot_name: Lucille MK2
+created: 2026-05-20
 status: in-development
 predecessor: "[[Lucille]]"
 concept: The Walking Dead (Negan's Bat)

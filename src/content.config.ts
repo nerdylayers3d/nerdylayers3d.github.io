@@ -6,9 +6,21 @@ const robots = defineCollection({
   schema: z.object({
     fileClass: z.string().optional(),
     robot_name: z.string().optional(),
+    created: z.union([z.string(), z.date()]).transform((v) => {
+      if (v instanceof Date) return v.toISOString().slice(0, 10);
+      return v;
+    }).optional(),
     concept: z.string().optional(),
     cover: z.string().optional(),
     category: z.string().optional(),
+    makerworld_url: z.string().optional(),
+    makerworld_category: z.string().optional(),
+    source_url: z.string().optional(),
+    mw_likes: z.union([z.string(), z.number()]).optional(),
+    mw_boosts: z.union([z.string(), z.number()]).optional(),
+    mw_downloads: z.union([z.string(), z.number()]).optional(),
+    mw_prints: z.union([z.string(), z.number()]).optional(),
+    mw_rating: z.string().optional(),
     weight: z.string().optional(),
     target_weight: z.string().optional(),
     weight_note: z.string().optional(),
