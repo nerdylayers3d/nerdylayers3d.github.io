@@ -82,58 +82,56 @@ const isActive = !isPrint && (data.status === "in-development" || data.status ==
   description={data.concept || `${name} — a Nerdy Layers 3D project.`}
   image={data.cover}
 >
-  <div class="mx-auto max-w-7xl px-4 py-8 sm:px-8 sm:py-12">
+  <div class="mx-auto max-w-[1280px] px-4 py-8 sm:px-8 sm:py-12">
     <a
       href="/"
-      class="label-technical mb-6 inline-flex items-center gap-1 text-xs"
-      style="color: var(--color-muted);"
+      class="font-label-technical text-label-technical mb-6 inline-flex items-center gap-1 text-on-surface-variant transition-colors hover:text-primary"
     >
-      ← Back to projects
+      <span class="material-symbols-outlined text-base">arrow_back</span>
+      Back to projects
     </a>
 
-    {/* Hero header with cover */}
+    {/* Hero header */}
     <header class="mb-10">
       <div class="mb-4 flex flex-wrap items-center gap-2">
-        <span class="badge badge-amber">{data.category || "robot"}</span>
+        <span class="rounded bg-surface-container-high px-3 py-1 font-label-technical text-xs uppercase text-secondary">
+          {data.category || "robot"}
+        </span>
         {data.status && !isPrint && (
-          <span class={`badge ${statusBadgeClass(data.status)}`}>{data.status}</span>
+          <span class={`rounded px-3 py-1 font-label-technical text-xs uppercase ${data.status === "discontinued" || data.status === "retired" ? "border border-primary/40 bg-primary/10 text-primary" : "bg-surface-container-high text-secondary"}`}>
+            {data.status}
+          </span>
         )}
         {isActive && (
-          <span class="label-technical inline-flex items-center gap-1.5 text-[10px]" style="color: var(--color-accent);">
-            <span class="status-pulse h-1.5 w-1.5 rounded-full" style="background: var(--color-accent);"></span>
+          <span class="font-label-technical inline-flex items-center gap-1.5 text-[10px] text-primary">
+            <span class="status-pulse h-1.5 w-1.5 rounded-full bg-primary"></span>
             LIVE
           </span>
         )}
       </div>
-      <h1
-        class="brand-heading text-5xl leading-tight tracking-tight sm:text-6xl md:text-7xl"
-        style="color: var(--color-accent);"
-      >
+      <h1 class="font-display-lg text-display-lg leading-tight tracking-tight text-white">
         {name}
       </h1>
       {data.concept && (
-        <p class="mt-3 text-base sm:text-lg" style="color: var(--color-muted);">
+        <p class="font-body-lg text-body-lg mt-3 text-on-surface-variant">
           {data.concept}
         </p>
       )}
 
       {data.status === "discontinued" && data.discontinued_after && (
-        <div
-          class="mt-5 flex items-start gap-3 rounded-lg border-l-4 p-4 text-sm"
-          style="background: rgba(255, 138, 0, 0.08); border-color: var(--color-accent-strong); color: var(--color-muted);"
-        >
-          <span class="label-technical shrink-0" style="color: var(--color-accent);">RETIRED</span>
-          <span>
-            after <strong style="color: var(--color-text);">{data.discontinued_after}</strong>
+        <div class="mt-5 flex items-start gap-3 rounded-lg border-l-4 border-primary-container bg-primary-container/10 p-4 text-sm">
+          <span class="font-label-technical shrink-0 text-primary">RETIRED</span>
+          <span class="text-on-surface-variant">
+            after <strong class="text-white">{data.discontinued_after}</strong>
             {data.discontinued_date && <span> ({data.discontinued_date})</span>}
             {data.successor && resolveRobotLink(data.successor) && (
-              <> — succeeded by <a href={resolveRobotLink(data.successor)!.href} class="underline" style="color: var(--color-accent);">{resolveRobotLink(data.successor)!.name}</a></>
+              <> — succeeded by <a href={resolveRobotLink(data.successor)!.href} class="text-primary underline">{resolveRobotLink(data.successor)!.name}</a></>
             )}
           </span>
         </div>
       )}
 
-      {/* External link bar — CAD/photos/MakerWorld/source */}
+      {/* External link bar */}
       {(data.cad || data.photos || data.makerworld_url || data.source_url) && (
         <div class="mt-6 flex flex-wrap gap-3">
           {data.cad && (
@@ -141,10 +139,10 @@ const isActive = !isPrint && (data.status === "in-development" || data.status ==
               href={data.cad}
               target="_blank"
               rel="noopener noreferrer"
-              class="label-technical inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs transition-colors"
-              style="border-color: var(--color-border); color: var(--color-text);"
+              class="font-label-technical inline-flex items-center gap-2 rounded-full border border-outline px-4 py-2 text-xs text-on-surface transition-colors hover:border-primary hover:text-primary"
             >
-              <span style="color: var(--color-accent);">⚙</span> View CAD in Onshape ↗
+              <span class="material-symbols-outlined text-base text-primary">precision_manufacturing</span>
+              View CAD in Onshape
             </a>
           )}
           {data.photos && (
@@ -152,10 +150,10 @@ const isActive = !isPrint && (data.status === "in-development" || data.status ==
               href={data.photos}
               target="_blank"
               rel="noopener noreferrer"
-              class="label-technical inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs transition-colors"
-              style="border-color: var(--color-border); color: var(--color-text);"
+              class="font-label-technical inline-flex items-center gap-2 rounded-full border border-outline px-4 py-2 text-xs text-on-surface transition-colors hover:border-primary hover:text-primary"
             >
-              <span style="color: var(--color-accent);">📷</span> Photo album ↗
+              <span class="material-symbols-outlined text-base text-primary">photo_library</span>
+              Photo album
             </a>
           )}
           {data.makerworld_url && (
@@ -163,10 +161,10 @@ const isActive = !isPrint && (data.status === "in-development" || data.status ==
               href={data.makerworld_url}
               target="_blank"
               rel="noopener noreferrer"
-              class="label-technical inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs"
-              style="background: var(--color-accent); color: var(--color-bg);"
+              class="font-label-technical inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs text-on-primary transition-transform hover:scale-95"
             >
-              Download on MakerWorld ↗
+              <span class="material-symbols-outlined text-base">download</span>
+              Download on MakerWorld
             </a>
           )}
           {!data.makerworld_url && data.source_url && (
@@ -174,22 +172,19 @@ const isActive = !isPrint && (data.status === "in-development" || data.status ==
               href={data.source_url}
               target="_blank"
               rel="noopener noreferrer"
-              class="label-technical inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs"
-              style="border-color: var(--color-border); color: var(--color-text);"
+              class="font-label-technical inline-flex items-center gap-2 rounded-full border border-outline px-4 py-2 text-xs text-on-surface transition-colors hover:border-primary hover:text-primary"
             >
-              View on Instagram ↗
+              <span class="material-symbols-outlined text-base text-primary">photo_camera</span>
+              View on Instagram
             </a>
           )}
         </div>
       )}
     </header>
 
-    {/* Cover image, full-bleed within the container */}
+    {/* Cover image */}
     {data.cover && (
-      <div
-        class="mb-10 overflow-hidden rounded-xl border"
-        style="border-color: var(--color-border); background: var(--color-bg-deep);"
-      >
+      <div class="mb-10 overflow-hidden rounded-xl border border-outline-variant bg-surface-container-lowest">
         <img
           src={`/assets/${data.cover}`}
           alt={`${name} cover photo`}
@@ -201,39 +196,27 @@ const isActive = !isPrint && (data.status === "in-development" || data.status ==
     {/* 8/4 layout: build log + sticky sidebar */}
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
       <article class="lg:col-span-8">
-        <h2 class="brand-heading mb-4 text-2xl sm:text-3xl">Build log</h2>
-        <div
-          class="prose-content rounded-xl border p-5 sm:p-8"
-          style="background: var(--color-surface); border-color: var(--color-border);"
-        >
+        <h2 class="font-headline-lg text-headline-lg mb-4 text-white">Build log</h2>
+        <div class="prose-content rounded-xl border border-outline-variant bg-surface-container p-5 sm:p-8">
           <Content />
         </div>
       </article>
 
       <aside class="lg:col-span-4">
         <div class="lg:sticky lg:top-24">
-          <h2 class="brand-heading mb-4 text-xl">
+          <h2 class="font-headline-md text-headline-md mb-4 text-white">
             {isPrint ? "Print stats" : "Specifications"}
           </h2>
-          <div
-            class="rounded-xl border p-5"
-            style="background: var(--color-surface); border-color: var(--color-border);"
-          >
-            <dl class="divide-y" style="border-color: var(--color-border);">
+          <div class="rounded-xl border border-outline-variant bg-surface-container p-5">
+            <dl>
               {(isPrint ? printMetrics : specs).map((spec, i) => (
-                <div class={`grid grid-cols-[40%_1fr] items-baseline gap-3 py-2.5 ${i > 0 ? "border-t" : ""}`} style="border-color: var(--color-border);">
-                  <dt
-                    class="label-technical text-[10px]"
-                    style="color: var(--color-muted);"
-                  >
+                <div class={`grid grid-cols-[40%_1fr] items-baseline gap-3 py-2.5 ${i > 0 ? "border-t border-outline-variant" : ""}`}>
+                  <dt class="font-label-technical text-[10px] text-on-surface-variant">
                     {spec.label}
                   </dt>
-                  <dd
-                    class="label-technical text-xs"
-                    style="color: var(--color-text); overflow-wrap: anywhere;"
-                  >
+                  <dd class="font-label-technical text-xs text-white" style="overflow-wrap: anywhere;">
                     {(spec as any).link ? (
-                      <a href={(spec as any).link.href} style="color: var(--color-accent);">
+                      <a href={(spec as any).link.href} class="text-primary hover:underline">
                         {(spec as any).link.name}
                       </a>
                     ) : (

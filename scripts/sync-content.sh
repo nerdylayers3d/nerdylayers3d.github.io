@@ -43,6 +43,10 @@ slugify_filename() {
 }
 
 # Clean previous sync
+# NOTE: this wipe deletes everything under public/assets/. Static site assets
+# that aren't synced from the vault (e.g. hero artwork) must live elsewhere
+# under public/ — see public/hero/. Don't add subfolders inside public/assets/
+# unless you also restore them in this script.
 rm -rf "$ROBOTS_DEST" "$COMPONENTS_DEST" "$ASSETS_DEST"
 mkdir -p "$ROBOTS_DEST" "$COMPONENTS_DEST" "$ASSETS_DEST"
 

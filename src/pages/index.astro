@@ -21,19 +21,39 @@ const sortedRobots = [...projects].sort((a, b) => {
   return a.id.localeCompare(b.id);
 });
 
-// Build-time timestamp shown in the Active Builds header as "Last update:".
-// Astro is a static-site generator, so this is evaluated once at build time
-// and baked into the HTML — refreshes when you redeploy.
+// Build-time timestamp shown in the "Active Builds" header. Re-renders on
+// each deploy.
 const buildDate = new Date().toISOString().slice(0, 10);
 
-// Bento layout: the first four cards get wide spans (8/4 then 5/7), the rest
-// fall back to uniform 4-col tiles on desktop. Mobile collapses to one column.
-const colSpan = (i: number): string => {
-  if (i === 0) return "md:col-span-8";
-  if (i === 1) return "md:col-span-4";
-  if (i === 2) return "md:col-span-5";
-  if (i === 3) return "md:col-span-7";
-  return "md:col-span-4";
+// Bento layout mirrors the Stitch reference exactly:
+//   row 1: hero card (8 cols) + side card (4 cols)
+//   row 2: medium card (5 cols) + split-image card (7 cols)
+//   row 3+: uniform 4-col tiles
+type Variant = "hero" | "side" | "medium" | "split" | "tile";
+const variantFor = (i: number): Variant => {
+  if (i === 0) return "hero";
+  if (i === 1) return "side";
+  if (i === 2) return "medium";
+  if (i === 3) return "split";
+  return "tile";
+};
+const spanFor = (v: Variant): string => {
+  switch (v) {
+    case "hero":   return "md:col-span-8";
+    case "side":   return "md:col-span-4";
+    case "medium": return "md:col-span-5";
+    case "split":  return "md:col-span-7";
+    default:       return "md:col-span-4";
+  }
+};
+
+// Pick a Material Symbols icon for each project type. Used by the small icon
+// block in the top-right of hero cards.
+const iconFor = (data: any): string => {
+  if (data.category === "print") return "deployed_code";
+  if (data.category === "software") return "code";
+  if (data.category === "experimental") return "biotech";
+  return "precision_manufacturing"; // combat robots
 };
 
 const statusBadgeClass = (status: string | undefined) => {
@@ -44,245 +64,418 @@ const statusBadgeClass = (status: string | undefined) => {
 ---
 
 <BaseLayout
-  title="Nerdy Layers 3D"
+  title="Nerdy Layers 3D | Combat Robotics &amp; 3D Printing"
   description="I build combat robots and 3D-printed things. Sometimes they work."
 >
-  {/* Hero */}
-  <header class="mx-auto max-w-7xl px-4 py-16 text-center sm:px-8 sm:py-24">
-    <h1 class="brand-heading text-5xl leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
-      Combat Robotics &amp;
-      <span style="color: var(--color-accent-strong);">3D Printing</span>
-    </h1>
-    <p class="mx-auto mt-6 max-w-2xl text-base sm:text-lg" style="color: var(--color-muted);">
-      I build combat robots and 3D-printed things. Sometimes they work.
-    </p>
-    <div class="mt-10 flex flex-wrap justify-center gap-3 sm:gap-4">
-      <a href="#projects" class="btn-primary">
-        View Projects →
-      </a>
-      <a
-        href="https://makerworld.com/en/@nerdylayers3d"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="btn-ghost"
-      >
-        MakerWorld ↗
-      </a>
-    </div>
-  </header>
+  <main class="pb-20">
+    {/* ====================================================================
+        Hero — full-bleed workshop scene behind the headline. The dark
+        gradient overlay keeps the text legible regardless of image content.
+        ==================================================================== */}
+    <header class="relative w-full overflow-hidden">
+      {/* Background image */}
+      <img
+        src="/hero/nl3d-hero-robot.png"
+        alt=""
+        aria-hidden="true"
+        class="absolute inset-0 h-full w-full object-cover"
+        loading="eager"
+        fetchpriority="high"
+      />
+      {/* Dark gradient overlay — top→bottom + slight left-edge tint so the
+          centered text stays readable over any image content. */}
+      <div
+        class="absolute inset-0"
+        style="background: linear-gradient(180deg, rgba(20, 17, 32, 0.65) 0%, rgba(20, 17, 32, 0.85) 60%, rgba(20, 17, 32, 1) 100%);"
+        aria-hidden="true"
+      ></div>
 
-  {/* Projects grid */}
-  <section id="projects" class="mx-auto max-w-7xl px-4 pb-20 sm:px-8">
-    <div class="mb-10 flex items-end justify-between">
-      <div>
-        <h2 class="brand-heading text-3xl sm:text-4xl">Active Builds</h2>
-        <p class="mt-1 text-sm" style="color: var(--color-muted);">
-          Documented engineering logs and downloadable models.
+      <div class="relative mx-auto max-w-[1280px] px-4 py-24 text-center sm:px-16 md:py-36 lg:py-44">
+        <h1 class="font-display-lg text-display-lg mb-6 text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.7)]">
+          Combat Robotics &amp;
+          <span class="text-primary-container">3D Printing</span>
+        </h1>
+        <p class="font-body-lg text-body-lg mx-auto mb-10 max-w-2xl text-on-surface-variant">
+          I build combat robots and 3D-printed things. Sometimes they work.
         </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a
+            href="#projects"
+            class="flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-lg font-bold text-on-primary transition-transform hover:scale-95 active:scale-90"
+          >
+            View Projects
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
+          <a
+            href="https://makerworld.com/en/@nerdylayers3d"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-full border border-primary bg-surface/40 px-8 py-4 text-lg font-bold text-primary backdrop-blur-sm transition-colors hover:bg-primary/10"
+        >
+            The Workshop
+          </a>
+        </div>
       </div>
-      <span class="label-technical hidden text-xs sm:inline" style="color: var(--color-accent);">
-        Last update: {buildDate}
-      </span>
-    </div>
+    </header>
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-12">
-      {
-        sortedRobots.map((robot, i) => {
-          const name = robot.data.robot_name || robot.id;
-          const weight = robot.data.weight
-            ? `${robot.data.weight}g`
-            : robot.data.target_weight
-              ? `~${robot.data.target_weight}g`
-              : null;
-          const isPrint = robot.data.category === "print";
-          const isDiscontinued =
-            !isPrint && (robot.data.status === "discontinued" || robot.data.status === "retired");
-          const isActive =
-            !isPrint && (robot.data.status === "in-development" || robot.data.status === "active");
+    {/* ====================================================================
+        Active Builds — section header + bento grid.
+        ==================================================================== */}
+    <section id="projects" class="mx-auto max-w-[1280px] px-4 sm:px-16">
+      <div class="mb-12 flex items-end justify-between">
+        <div>
+          <h2 class="font-headline-lg text-headline-lg text-white">Active Builds</h2>
+          <p class="font-body-md text-on-surface-variant">
+            Documented engineering logs and downloadable models.
+          </p>
+        </div>
+        <span class="hidden font-label-technical text-label-technical uppercase tracking-widest text-primary md:block">
+          Last update: {buildDate}
+        </span>
+      </div>
 
-          const externalHref = robot.data.makerworld_url || robot.data.source_url;
-          const cardHref = isPrint && externalHref
-            ? externalHref
-            : `/robots/${robot.id}`;
-          const isExternal = cardHref.startsWith("http");
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-12">
+        {
+          sortedRobots.map((robot, i) => {
+            const data = robot.data;
+            const name = data.robot_name || robot.id;
+            const variant = variantFor(i);
+            const span = spanFor(variant);
+            const isPrint = data.category === "print";
+            const isDiscontinued =
+              !isPrint && (data.status === "discontinued" || data.status === "retired");
+            const isActive =
+              !isPrint && (data.status === "in-development" || data.status === "active");
 
-          // Robot/software cards: extract a short weapon class + drive label
-          // for the inline tech strip.
-          let weaponShort: string | null = null;
-          if (robot.data.weapon_type && !/^none/i.test(robot.data.weapon_type)) {
-            const wm = robot.data.weapon_type.match(
-              /\b(drum|spinner|hammer|wedge|saw|flipper|disc|bar|axe|spike)\b/i
-            );
-            weaponShort = wm
-              ? wm[1].charAt(0).toUpperCase() + wm[1].slice(1).toLowerCase()
-              : robot.data.weapon_type.split(/[\s(,]/)[0];
-          }
-          let driveShort: string | null = null;
-          if (robot.data.drive_layout) {
-            const m = robot.data.drive_layout.match(/\b(\d?WD|tracked)\b/i);
-            driveShort = m ? m[1].toUpperCase() : null;
-          }
+            const externalHref = data.makerworld_url || data.source_url;
+            const cardHref = isPrint && externalHref
+              ? externalHref
+              : `/robots/${robot.id}`;
+            const isExternal = cardHref.startsWith("http");
 
-          const span = colSpan(i);
-          const isWide = i === 0 || i === 3;
+            const icon = iconFor(data);
 
-          return (
-            <a
-              href={cardHref}
-              target={isExternal ? "_blank" : undefined}
-              rel={isExternal ? "noopener noreferrer" : undefined}
-              class={`group card-glow relative flex flex-col overflow-hidden rounded-xl border ${span} ${isDiscontinued ? "opacity-70 hover:opacity-100" : ""}`}
-              style="background: var(--color-surface); border-color: var(--color-border);"
-            >
-              <div
-                class={`w-full overflow-hidden ${isWide ? "aspect-[16/9]" : "aspect-[16/10]"}`}
-                style="background: var(--color-bg-deep);"
-              >
-                {robot.data.cover ? (
-                  <img
-                    src={`/assets/${robot.data.cover}`}
-                    alt={`${name} cover`}
-                    loading="lazy"
-                    class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <div
-                    class="flex h-full w-full items-center justify-center text-6xl font-bold"
-                    style="color: var(--color-muted); font-family: var(--font-display);"
-                  >
-                    {name.slice(0, 1).toUpperCase()}
-                  </div>
-                )}
-              </div>
+            // Build the 4-up spec block (hero/split variants) or the
+            // metrics-only line (smaller variants). Each entry has a short
+            // monospace label + value pair.
+            const weightDisplay = data.weight
+              ? `${data.weight}g`
+              : data.target_weight
+                ? `~${data.target_weight}g`
+                : null;
+            let weaponShort: string | null = null;
+            if (data.weapon_type && !/^none/i.test(data.weapon_type)) {
+              const wm = data.weapon_type.match(
+                /\b(drum|spinner|hammer|wedge|saw|flipper|disc|bar|axe|spike)\b/i
+              );
+              weaponShort = wm
+                ? wm[1].charAt(0).toUpperCase() + wm[1].slice(1).toLowerCase()
+                : data.weapon_type.split(/[\s(,]/)[0];
+            }
+            let driveShort: string | null = null;
+            if (data.drive_layout) {
+              const m = data.drive_layout.match(/\b(\d?WD|tracked)\b/i);
+              driveShort = m ? m[1].toUpperCase() : null;
+            }
+            const statusLabel = data.status
+              ? data.status.replace("-", " ").toUpperCase()
+              : "ACTIVE";
 
-              <div class={`flex flex-1 flex-col ${isWide ? "p-6 sm:p-8" : "p-5 sm:p-6"}`}>
-                {/* Title + category icon row */}
-                <div class="mb-3 flex items-start justify-between gap-3">
-                  <h3
-                    class="brand-heading text-xl sm:text-2xl"
-                    style="color: var(--color-accent);"
-                  >
-                    {name}
-                  </h3>
-                  {isActive && (
-                    <span class="label-technical mt-1 flex shrink-0 items-center gap-1.5 text-[10px]" style="color: var(--color-accent);">
-                      <span class="status-pulse h-1.5 w-1.5 rounded-full" style="background: var(--color-accent);"></span>
-                      LIVE
-                    </span>
-                  )}
-                </div>
+            const printSpecs = [
+              data.mw_downloads != null && { label: "Downloads", value: data.mw_downloads },
+              data.mw_prints != null && { label: "Prints", value: data.mw_prints },
+              data.mw_likes != null && { label: "Likes", value: data.mw_likes },
+              data.mw_boosts != null && { label: "Boosts", value: data.mw_boosts },
+            ].filter(Boolean) as { label: string; value: any }[];
 
-                {/* Category + status chips */}
-                <div class="mb-3 flex flex-wrap items-center gap-2">
-                  <span class="badge badge-amber">{robot.data.category || "robot"}</span>
-                  {robot.data.status && !isPrint && (
-                    <span class={`badge ${statusBadgeClass(robot.data.status)}`}>
-                      {robot.data.status}
-                    </span>
-                  )}
-                </div>
+            const robotSpecs: { label: string; value: string }[] = [];
+            if (data.category) robotSpecs.push({ label: "Class", value: String(data.category).toUpperCase() });
+            if (weightDisplay) robotSpecs.push({ label: "Weight", value: weightDisplay });
+            if (weaponShort) robotSpecs.push({ label: "Weapon", value: weaponShort });
+            if (driveShort) robotSpecs.push({ label: "Drive", value: driveShort });
+            const fourUpSpecs = isPrint ? printSpecs : robotSpecs.slice(0, 4);
 
-                {robot.data.concept && (
-                  <p class="mb-4 text-sm" style="color: var(--color-muted);">
-                    {robot.data.concept}
-                  </p>
-                )}
+            const commonClasses = `${span} group project-card-glow ${isDiscontinued ? "opacity-70 hover:opacity-100" : ""} relative overflow-hidden rounded-xl border border-outline-variant bg-surface-container transition-all duration-300`;
 
-                {/* Stats block — Stitch-style 4-up grid of mono labels on wide
-                    cards, inline strip on small. Sits at the bottom via mt-auto. */}
-                {isPrint ? (
-                  <div
-                    class="mt-auto grid grid-cols-2 gap-3 rounded-lg p-3 sm:grid-cols-4"
-                    style="background: var(--color-bg-deep);"
-                  >
-                    {robot.data.mw_downloads != null && (
-                      <div>
-                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
-                          Downloads
-                        </span>
-                        <span class="label-technical text-xs" style="color: var(--color-text);">
-                          {robot.data.mw_downloads}
-                        </span>
-                      </div>
-                    )}
-                    {robot.data.mw_prints != null && (
-                      <div>
-                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
-                          Prints
-                        </span>
-                        <span class="label-technical text-xs" style="color: var(--color-text);">
-                          {robot.data.mw_prints}
-                        </span>
-                      </div>
-                    )}
-                    {robot.data.mw_likes != null && (
-                      <div>
-                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
-                          Likes
-                        </span>
-                        <span class="label-technical text-xs" style="color: var(--color-text);">
-                          {robot.data.mw_likes}
-                        </span>
-                      </div>
-                    )}
-                    {robot.data.mw_boosts != null && (
-                      <div>
-                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
-                          Boosts
-                        </span>
-                        <span class="label-technical text-xs" style="color: var(--color-text);">
-                          {robot.data.mw_boosts}
-                        </span>
+            // ----------------------------------------------------------------
+            // Variant: HERO (col-span-8) — large aspect-video image, internal
+            // padding, 4-up spec strip at the bottom.
+            // ----------------------------------------------------------------
+            if (variant === "hero") {
+              return (
+                <a
+                  href={cardHref}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  class={commonClasses}
+                >
+                  <div class="aspect-video w-full overflow-hidden">
+                    {data.cover ? (
+                      <img
+                        src={`/assets/${data.cover}`}
+                        alt={`${name} cover`}
+                        loading="lazy"
+                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div class="flex h-full w-full items-center justify-center bg-surface-container-low font-display-lg text-6xl text-on-surface-variant">
+                        {name.slice(0, 1).toUpperCase()}
                       </div>
                     )}
                   </div>
-                ) : (
-                  (weight || weaponShort || driveShort) && (
-                    <div
-                      class="mt-auto grid grid-cols-3 gap-3 rounded-lg p-3"
-                      style="background: var(--color-bg-deep);"
-                    >
+                  <div class="p-8">
+                    <div class="mb-4 flex items-start justify-between gap-3">
                       <div>
-                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
-                          Weight
-                        </span>
-                        <span class="label-technical text-xs" style="color: var(--color-text);">
-                          {weight || "—"}
-                        </span>
+                        <h3 class="font-headline-md text-headline-md mb-2 text-primary">{name}</h3>
+                        <div class="flex flex-wrap gap-2">
+                          <span class="rounded bg-surface-container-high px-3 py-1 font-label-technical text-xs text-secondary">
+                            {String(data.category || "robot").toUpperCase()}
+                          </span>
+                          {data.status && !isPrint && (
+                            <span class="rounded bg-surface-container-high px-3 py-1 font-label-technical text-xs text-secondary">
+                              {statusLabel}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
-                          Weapon
-                        </span>
-                        <span class="label-technical text-xs" style="color: var(--color-text);">
-                          {weaponShort || "—"}
-                        </span>
-                      </div>
-                      <div>
-                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
-                          Drive
-                        </span>
-                        <span class="label-technical text-xs" style="color: var(--color-text);">
-                          {driveShort || "—"}
-                        </span>
-                      </div>
+                      <span class="material-symbols-outlined text-4xl text-primary">{icon}</span>
                     </div>
-                  )
-                )}
-
-                {/* External-source footer link for prints */}
-                {isPrint && (
-                  <div class="mt-3 flex items-center justify-end">
-                    <span class="label-technical text-[10px]" style="color: var(--color-accent);">
-                      {robot.data.makerworld_url ? "MakerWorld ↗" : "Instagram ↗"}
-                    </span>
+                    {data.concept && (
+                      <p class="font-body-md mb-6 text-on-surface-variant">{data.concept}</p>
+                    )}
+                    {fourUpSpecs.length > 0 && (
+                      <div class="grid grid-cols-2 gap-4 rounded-lg bg-surface-container-low p-4 md:grid-cols-4">
+                        {fourUpSpecs.map((s) => (
+                          <div>
+                            <span class="block font-label-technical text-[10px] uppercase tracking-tighter text-secondary">
+                              {s.label}
+                            </span>
+                            <span class="font-label-technical text-xs text-white">{s.value}</span>
+                          </div>
+                        ))}
+                        {isActive && (
+                          <div>
+                            <span class="block font-label-technical text-[10px] uppercase tracking-tighter text-secondary">
+                              Status
+                            </span>
+                            <span class="flex items-center gap-1 font-label-technical text-xs text-primary">
+                              <span class="status-pulse h-1.5 w-1.5 rounded-full bg-primary"></span>
+                              LIVE
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </a>
-          );
-        })
-      }
-    </div>
-  </section>
+                </a>
+              );
+            }
+
+            // ----------------------------------------------------------------
+            // Variant: SIDE (col-span-4) — aspect-square image, compact body
+            // with status line + circular launch button.
+            // ----------------------------------------------------------------
+            if (variant === "side") {
+              return (
+                <a
+                  href={cardHref}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  class={`${commonClasses} flex flex-col`}
+                >
+                  <div class="aspect-square w-full overflow-hidden rounded-t-xl">
+                    {data.cover ? (
+                      <img
+                        src={`/assets/${data.cover}`}
+                        alt={`${name} cover`}
+                        loading="lazy"
+                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div class="flex h-full w-full items-center justify-center bg-surface-container-low font-display-lg text-6xl text-on-surface-variant">
+                        {name.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div class="flex flex-1 flex-col p-6">
+                    <h3 class="font-headline-md text-headline-md mb-2 text-primary">{name}</h3>
+                    {data.concept && (
+                      <p class="font-body-md mb-4 text-sm text-on-surface-variant">
+                        {data.concept}
+                      </p>
+                    )}
+                    <div class="mt-auto flex items-center justify-between">
+                      <span class="font-label-technical text-xs text-secondary">
+                        {isPrint
+                          ? (data.makerworld_url ? "MAKERWORLD" : "INSTAGRAM")
+                          : weaponShort
+                            ? `${weaponShort.toUpperCase()} SPINNER`
+                            : statusLabel}
+                      </span>
+                      <span
+                        class="flex h-10 w-10 items-center justify-center rounded-full border border-primary text-primary transition-all group-hover:bg-primary group-hover:text-on-primary"
+                      >
+                        <span class="material-symbols-outlined">launch</span>
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              );
+            }
+
+            // ----------------------------------------------------------------
+            // Variant: MEDIUM (col-span-5) — aspect-video image, body with
+            // checklist of key facts using Material Symbols check_circle.
+            // ----------------------------------------------------------------
+            if (variant === "medium") {
+              const bullets: string[] = [];
+              if (isPrint) {
+                if (data.mw_downloads != null) bullets.push(`${data.mw_downloads} downloads`);
+                if (data.mw_prints != null) bullets.push(`${data.mw_prints} reported prints`);
+              } else {
+                if (weightDisplay) bullets.push(weightDisplay);
+                if (weaponShort) bullets.push(`${weaponShort} weapon`);
+                if (driveShort) bullets.push(`${driveShort} drive`);
+              }
+              return (
+                <a
+                  href={cardHref}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  class={commonClasses}
+                >
+                  <div class="aspect-video w-full overflow-hidden rounded-t-xl">
+                    {data.cover ? (
+                      <img
+                        src={`/assets/${data.cover}`}
+                        alt={`${name} cover`}
+                        loading="lazy"
+                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div class="flex h-full w-full items-center justify-center bg-surface-container-low font-display-lg text-6xl text-on-surface-variant">
+                        {name.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div class="p-6">
+                    <h3 class="font-headline-md text-headline-md mb-2 text-primary">{name}</h3>
+                    {data.concept && (
+                      <p class="font-body-md mb-4 text-on-surface-variant">{data.concept}</p>
+                    )}
+                    <ul class="mb-2 space-y-2">
+                      {bullets.map((b) => (
+                        <li class="flex items-center gap-2 font-label-technical text-xs text-on-surface-variant">
+                          <span class="material-symbols-outlined text-sm text-primary">check_circle</span>
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </a>
+              );
+            }
+
+            // ----------------------------------------------------------------
+            // Variant: SPLIT (col-span-7) — image on the left half, text on
+            // the right half. Bottom CTA arrow that grows on hover.
+            // ----------------------------------------------------------------
+            if (variant === "split") {
+              const tags: string[] = [];
+              if (data.category) tags.push(String(data.category));
+              if (isPrint && data.makerworld_url) tags.push("MakerWorld");
+              if (data.status && !isPrint) tags.push(data.status);
+              return (
+                <a
+                  href={cardHref}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  class={`${commonClasses} flex flex-col md:flex-row`}
+                >
+                  <div class="overflow-hidden md:w-1/2">
+                    {data.cover ? (
+                      <img
+                        src={`/assets/${data.cover}`}
+                        alt={`${name} cover`}
+                        loading="lazy"
+                        class="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div class="flex h-full w-full items-center justify-center bg-surface-container-low font-display-lg text-6xl text-on-surface-variant">
+                        {name.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div class="flex flex-col p-8 md:w-1/2">
+                    <h3 class="font-headline-md text-headline-md mb-2 text-primary">{name}</h3>
+                    {data.concept && (
+                      <p class="font-body-md mb-6 text-on-surface-variant">{data.concept}</p>
+                    )}
+                    <div class="mt-auto">
+                      <div class="mb-6 flex flex-wrap gap-2">
+                        {tags.map((t) => (
+                          <span class="rounded border border-outline px-2 py-1 font-label-technical text-[10px] uppercase">
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                      <span class="flex items-center gap-2 font-bold text-primary transition-all group-hover:gap-4">
+                        {isPrint ? "Open Model" : "Project Breakdown"}
+                        <span class="material-symbols-outlined">east</span>
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              );
+            }
+
+            // ----------------------------------------------------------------
+            // Variant: TILE (default, col-span-4) — compact uniform tile.
+            // ----------------------------------------------------------------
+            return (
+              <a
+                href={cardHref}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                class={`${commonClasses} flex flex-col`}
+              >
+                <div class="aspect-video w-full overflow-hidden rounded-t-xl">
+                  {data.cover ? (
+                    <img
+                      src={`/assets/${data.cover}`}
+                      alt={`${name} cover`}
+                      loading="lazy"
+                      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div class="flex h-full w-full items-center justify-center bg-surface-container-low font-display-lg text-6xl text-on-surface-variant">
+                      {name.slice(0, 1).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <div class="flex flex-1 flex-col p-5">
+                  <h3 class="font-headline-md text-headline-md mb-2 text-primary">{name}</h3>
+                  {data.concept && (
+                    <p class="font-body-md mb-3 text-sm text-on-surface-variant">{data.concept}</p>
+                  )}
+                  <div class="mt-auto flex items-center justify-between">
+                    <span class="font-label-technical text-[10px] text-secondary">
+                      {isPrint
+                        ? `${data.mw_downloads ?? 0} downloads`
+                        : weightDisplay || statusLabel}
+                    </span>
+                    {isPrint && (
+                      <span class="font-label-technical text-[10px] text-primary">
+                        {data.makerworld_url ? "MakerWorld ↗" : "Instagram ↗"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </a>
+            );
+          })
+        }
+      </div>
+    </section>
+  </main>
 </BaseLayout>

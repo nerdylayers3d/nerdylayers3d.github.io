@@ -3,20 +3,22 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Page not found — Nerdy Layers 3D">
-  <div class="mx-auto max-w-7xl px-4 py-24 text-center sm:px-8 sm:py-32">
-    <h1 class="brand-heading text-7xl sm:text-8xl">404</h1>
-    <p class="mt-2 text-lg sm:text-xl" style="color: var(--color-text);">
+  <div class="mx-auto max-w-[1280px] px-4 py-24 text-center sm:px-8 sm:py-32">
+    <h1 class="font-display-lg text-[120px] leading-none text-primary sm:text-[160px]">
+      404
+    </h1>
+    <p class="font-body-lg text-body-lg mt-4 text-white">
       This page doesn't exist (yet).
     </p>
-    <p class="mt-2" style="color: var(--color-muted);">
+    <p class="font-body-md mt-2 text-on-surface-variant">
       The link you followed is either broken or the page has been moved.
     </p>
     <a
       href="/"
-      class="mt-6 inline-block rounded-full px-6 py-3 font-semibold transition-transform hover:-translate-y-0.5 hover:no-underline"
-      style="background: var(--color-accent); color: var(--color-bg); box-shadow: 0 3px 0 var(--color-accent-shadow); font-family: var(--font-display);"
+      class="mt-8 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 font-bold text-on-primary transition-transform hover:scale-95"
     >
-      ← Back to projects
+      <span class="material-symbols-outlined">arrow_back</span>
+      Back to projects
     </a>
   </div>
 </BaseLayout>
