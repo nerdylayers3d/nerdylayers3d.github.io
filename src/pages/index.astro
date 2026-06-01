@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { displayValue } from "../lib/utils";
 
 const allProjects = await getCollection("robots");
 
@@ -22,6 +21,21 @@ const sortedRobots = [...projects].sort((a, b) => {
   return a.id.localeCompare(b.id);
 });
 
+// Build-time timestamp shown in the Active Builds header as "Last update:".
+// Astro is a static-site generator, so this is evaluated once at build time
+// and baked into the HTML — refreshes when you redeploy.
+const buildDate = new Date().toISOString().slice(0, 10);
+
+// Bento layout: the first four cards get wide spans (8/4 then 5/7), the rest
+// fall back to uniform 4-col tiles on desktop. Mobile collapses to one column.
+const colSpan = (i: number): string => {
+  if (i === 0) return "md:col-span-8";
+  if (i === 1) return "md:col-span-4";
+  if (i === 2) return "md:col-span-5";
+  if (i === 3) return "md:col-span-7";
+  return "md:col-span-4";
+};
+
 const statusBadgeClass = (status: string | undefined) => {
   if (!status) return "";
   if (status === "discontinued" || status === "retired") return "badge-orange-outline";
@@ -31,155 +45,244 @@ const statusBadgeClass = (status: string | undefined) => {
 
 <BaseLayout
   title="Nerdy Layers 3D"
-  description="Combat robotics builds, 3D-printed mechanisms, and electronics tinkering by Nerdy Layers 3D."
+  description="I build combat robots and 3D-printed things. Sometimes they work."
 >
-  <header class="mb-8">
-    <h1 class="brand-heading text-4xl sm:text-5xl md:text-6xl">Projects</h1>
-    <p class="mt-2 text-base sm:text-lg" style="color: var(--color-muted);">
-      Combat robotics builds, 3D-printed mechanisms, and electronics tinkering by Nerdy Layers 3D.
+  {/* Hero */}
+  <header class="mx-auto max-w-7xl px-4 py-16 text-center sm:px-8 sm:py-24">
+    <h1 class="brand-heading text-5xl leading-[1.05] tracking-tight sm:text-6xl md:text-7xl">
+      Combat Robotics &amp;
+      <span style="color: var(--color-accent-strong);">3D Printing</span>
+    </h1>
+    <p class="mx-auto mt-6 max-w-2xl text-base sm:text-lg" style="color: var(--color-muted);">
+      I build combat robots and 3D-printed things. Sometimes they work.
     </p>
+    <div class="mt-10 flex flex-wrap justify-center gap-3 sm:gap-4">
+      <a href="#projects" class="btn-primary">
+        View Projects →
+      </a>
+      <a
+        href="https://makerworld.com/en/@nerdylayers3d"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-ghost"
+      >
+        MakerWorld ↗
+      </a>
+    </div>
   </header>
 
-  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    {
-      sortedRobots.map((robot) => {
-        const name = robot.data.robot_name || robot.id;
-        const weight = robot.data.weight
-          ? `${robot.data.weight}g`
-          : robot.data.target_weight
-            ? `~${robot.data.target_weight}g`
-            : null;
-        const isPrint = robot.data.category === "print";
-        const isDiscontinued =
-          !isPrint && (robot.data.status === "discontinued" || robot.data.status === "retired");
+  {/* Projects grid */}
+  <section id="projects" class="mx-auto max-w-7xl px-4 pb-20 sm:px-8">
+    <div class="mb-10 flex items-end justify-between">
+      <div>
+        <h2 class="brand-heading text-3xl sm:text-4xl">Active Builds</h2>
+        <p class="mt-1 text-sm" style="color: var(--color-muted);">
+          Documented engineering logs and downloadable models.
+        </p>
+      </div>
+      <span class="label-technical hidden text-xs sm:inline" style="color: var(--color-accent);">
+        Last update: {buildDate}
+      </span>
+    </div>
 
-        // For non-print cards, build a short inline metrics strip parallel to
-        // the prints strip below: weight + a one-word weapon class + a terse
-        // drive summary. Each field degrades cleanly if missing.
-        // weapon: pull a recognisable weapon-class keyword from weapon_type
-        // (drum/spinner/hammer/wedge/saw/flipper). If weapon_type just says
-        // "None" we hide the field entirely.
-        let weaponShort: string | null = null;
-        if (robot.data.weapon_type && !/^none/i.test(robot.data.weapon_type)) {
-          const wm = robot.data.weapon_type.match(
-            /\b(drum|spinner|hammer|wedge|saw|flipper|disc|bar|axe|spike)\b/i
-          );
-          weaponShort = wm
-            ? wm[1].charAt(0).toUpperCase() + wm[1].slice(1).toLowerCase()
-            : robot.data.weapon_type.split(/[\s(,]/)[0];
-        }
-        let driveShort: string | null = null;
-        if (robot.data.drive_layout) {
-          const m = robot.data.drive_layout.match(/\b(\d?WD|tracked)\b/i);
-          driveShort = m ? m[1].toUpperCase() : null;
-        }
-        // Prints link out to MakerWorld (or another source) since they have no
-        // dedicated detail page on this site. Everything else opens the local
-        // /robots/<id>/ detail page.
-        const externalHref = robot.data.makerworld_url || robot.data.source_url;
-        const cardHref = isPrint && externalHref
-          ? externalHref
-          : `/robots/${robot.id}`;
-        const isExternal = cardHref.startsWith("http");
-        return (
-          <a
-            href={cardHref}
-            target={isExternal ? "_blank" : undefined}
-            rel={isExternal ? "noopener noreferrer" : undefined}
-            class={`group block overflow-hidden rounded-xl border transition-colors hover:[border-color:var(--color-accent)] ${
-              isDiscontinued ? "opacity-65 hover:opacity-100" : ""
-            }`}
-            style="background: var(--color-surface); border-color: var(--color-border);"
-          >
-            <div
-              class="aspect-[16/10] w-full overflow-hidden border-b"
-              style="background: var(--color-bg-deep); border-color: var(--color-border);"
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-12">
+      {
+        sortedRobots.map((robot, i) => {
+          const name = robot.data.robot_name || robot.id;
+          const weight = robot.data.weight
+            ? `${robot.data.weight}g`
+            : robot.data.target_weight
+              ? `~${robot.data.target_weight}g`
+              : null;
+          const isPrint = robot.data.category === "print";
+          const isDiscontinued =
+            !isPrint && (robot.data.status === "discontinued" || robot.data.status === "retired");
+          const isActive =
+            !isPrint && (robot.data.status === "in-development" || robot.data.status === "active");
+
+          const externalHref = robot.data.makerworld_url || robot.data.source_url;
+          const cardHref = isPrint && externalHref
+            ? externalHref
+            : `/robots/${robot.id}`;
+          const isExternal = cardHref.startsWith("http");
+
+          // Robot/software cards: extract a short weapon class + drive label
+          // for the inline tech strip.
+          let weaponShort: string | null = null;
+          if (robot.data.weapon_type && !/^none/i.test(robot.data.weapon_type)) {
+            const wm = robot.data.weapon_type.match(
+              /\b(drum|spinner|hammer|wedge|saw|flipper|disc|bar|axe|spike)\b/i
+            );
+            weaponShort = wm
+              ? wm[1].charAt(0).toUpperCase() + wm[1].slice(1).toLowerCase()
+              : robot.data.weapon_type.split(/[\s(,]/)[0];
+          }
+          let driveShort: string | null = null;
+          if (robot.data.drive_layout) {
+            const m = robot.data.drive_layout.match(/\b(\d?WD|tracked)\b/i);
+            driveShort = m ? m[1].toUpperCase() : null;
+          }
+
+          const span = colSpan(i);
+          const isWide = i === 0 || i === 3;
+
+          return (
+            <a
+              href={cardHref}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              class={`group card-glow relative flex flex-col overflow-hidden rounded-xl border ${span} ${isDiscontinued ? "opacity-70 hover:opacity-100" : ""}`}
+              style="background: var(--color-surface); border-color: var(--color-border);"
             >
-              {robot.data.cover ? (
-                <img
-                  src={`/assets/${robot.data.cover}`}
-                  alt={`${name} cover`}
-                  loading="lazy"
-                  class="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                />
-              ) : (
-                <div class="flex h-full w-full items-center justify-center text-5xl font-bold" style="color: var(--color-muted); font-family: var(--font-display);">
-                  {name.slice(0, 1).toUpperCase()}
-                </div>
-              )}
-            </div>
-
-            <div class="p-4 sm:p-5">
-              <div class="mb-3 flex flex-wrap items-center gap-2">
-                <span class="badge badge-amber">{robot.data.category || "robot"}</span>
-                {robot.data.status && !isPrint && (
-                  <span class={`badge ${statusBadgeClass(robot.data.status)}`}>
-                    {robot.data.status}
-                  </span>
+              <div
+                class={`w-full overflow-hidden ${isWide ? "aspect-[16/9]" : "aspect-[16/10]"}`}
+                style="background: var(--color-bg-deep);"
+              >
+                {robot.data.cover ? (
+                  <img
+                    src={`/assets/${robot.data.cover}`}
+                    alt={`${name} cover`}
+                    loading="lazy"
+                    class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div
+                    class="flex h-full w-full items-center justify-center text-6xl font-bold"
+                    style="color: var(--color-muted); font-family: var(--font-display);"
+                  >
+                    {name.slice(0, 1).toUpperCase()}
+                  </div>
                 )}
               </div>
 
-              <h2 class="brand-heading mb-1 text-xl">{name}</h2>
-              {robot.data.concept && (
-                <p class="mb-3 text-sm italic" style="color: var(--color-muted);">
-                  {robot.data.concept}
-                </p>
-              )}
-
-              {robot.data.concept && (isPrint || weight || weaponShort || driveShort) && <div class="my-3 border-t" style="border-color: var(--color-border);" />}
-
-              {isPrint ? (
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" style="color: var(--color-muted);">
-                  {robot.data.mw_downloads != null && (
-                    <span>⬇ <strong style="color: var(--color-text);">{robot.data.mw_downloads}</strong> dl</span>
-                  )}
-                  {robot.data.mw_prints != null && (
-                    <span>🖨 <strong style="color: var(--color-text);">{robot.data.mw_prints}</strong> prints</span>
-                  )}
-                  {robot.data.mw_likes != null && (
-                    <span>👍 <strong style="color: var(--color-text);">{robot.data.mw_likes}</strong></span>
-                  )}
-                  {robot.data.mw_boosts != null && (
-                    <span>⚡ <strong style="color: var(--color-text);">{robot.data.mw_boosts}</strong></span>
-                  )}
-                  {robot.data.makerworld_url && (
-                    <span class="ml-auto" style="color: var(--color-link);">MakerWorld ↗</span>
-                  )}
-                  {!robot.data.makerworld_url && robot.data.source_url && (
-                    <span class="ml-auto" style="color: var(--color-link);">Instagram ↗</span>
+              <div class={`flex flex-1 flex-col ${isWide ? "p-6 sm:p-8" : "p-5 sm:p-6"}`}>
+                {/* Title + category icon row */}
+                <div class="mb-3 flex items-start justify-between gap-3">
+                  <h3
+                    class="brand-heading text-xl sm:text-2xl"
+                    style="color: var(--color-accent);"
+                  >
+                    {name}
+                  </h3>
+                  {isActive && (
+                    <span class="label-technical mt-1 flex shrink-0 items-center gap-1.5 text-[10px]" style="color: var(--color-accent);">
+                      <span class="status-pulse h-1.5 w-1.5 rounded-full" style="background: var(--color-accent);"></span>
+                      LIVE
+                    </span>
                   )}
                 </div>
-              ) : (weight || weaponShort || driveShort) && (
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs" style="color: var(--color-muted);">
-                  {weight && (
-                    <span>⚖ <strong style="color: var(--color-text);">{weight}</strong></span>
-                  )}
-                  {weaponShort && (
-                    <span>⚡ <strong style="color: var(--color-text);">{weaponShort}</strong></span>
-                  )}
-                  {driveShort && (
-                    <span>⚙ <strong style="color: var(--color-text);">{driveShort}</strong></span>
-                  )}
-                </div>
-              )}
 
-              {(robot.data.predecessor || robot.data.successor) && (
-                <div
-                  class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t pt-2 text-xs italic"
-                  style="color: var(--color-muted); border-color: var(--color-border); border-style: dashed;"
-                >
-                  {robot.data.predecessor && (
-                    <span>← {displayValue(robot.data.predecessor)}</span>
-                  )}
-                  {robot.data.successor && (
-                    <span>{displayValue(robot.data.successor)} →</span>
+                {/* Category + status chips */}
+                <div class="mb-3 flex flex-wrap items-center gap-2">
+                  <span class="badge badge-amber">{robot.data.category || "robot"}</span>
+                  {robot.data.status && !isPrint && (
+                    <span class={`badge ${statusBadgeClass(robot.data.status)}`}>
+                      {robot.data.status}
+                    </span>
                   )}
                 </div>
-              )}
-            </div>
-          </a>
-        );
-      })
-    }
-  </div>
+
+                {robot.data.concept && (
+                  <p class="mb-4 text-sm" style="color: var(--color-muted);">
+                    {robot.data.concept}
+                  </p>
+                )}
+
+                {/* Stats block — Stitch-style 4-up grid of mono labels on wide
+                    cards, inline strip on small. Sits at the bottom via mt-auto. */}
+                {isPrint ? (
+                  <div
+                    class="mt-auto grid grid-cols-2 gap-3 rounded-lg p-3 sm:grid-cols-4"
+                    style="background: var(--color-bg-deep);"
+                  >
+                    {robot.data.mw_downloads != null && (
+                      <div>
+                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
+                          Downloads
+                        </span>
+                        <span class="label-technical text-xs" style="color: var(--color-text);">
+                          {robot.data.mw_downloads}
+                        </span>
+                      </div>
+                    )}
+                    {robot.data.mw_prints != null && (
+                      <div>
+                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
+                          Prints
+                        </span>
+                        <span class="label-technical text-xs" style="color: var(--color-text);">
+                          {robot.data.mw_prints}
+                        </span>
+                      </div>
+                    )}
+                    {robot.data.mw_likes != null && (
+                      <div>
+                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
+                          Likes
+                        </span>
+                        <span class="label-technical text-xs" style="color: var(--color-text);">
+                          {robot.data.mw_likes}
+                        </span>
+                      </div>
+                    )}
+                    {robot.data.mw_boosts != null && (
+                      <div>
+                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
+                          Boosts
+                        </span>
+                        <span class="label-technical text-xs" style="color: var(--color-text);">
+                          {robot.data.mw_boosts}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  (weight || weaponShort || driveShort) && (
+                    <div
+                      class="mt-auto grid grid-cols-3 gap-3 rounded-lg p-3"
+                      style="background: var(--color-bg-deep);"
+                    >
+                      <div>
+                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
+                          Weight
+                        </span>
+                        <span class="label-technical text-xs" style="color: var(--color-text);">
+                          {weight || "—"}
+                        </span>
+                      </div>
+                      <div>
+                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
+                          Weapon
+                        </span>
+                        <span class="label-technical text-xs" style="color: var(--color-text);">
+                          {weaponShort || "—"}
+                        </span>
+                      </div>
+                      <div>
+                        <span class="label-technical block text-[10px]" style="color: var(--color-muted);">
+                          Drive
+                        </span>
+                        <span class="label-technical text-xs" style="color: var(--color-text);">
+                          {driveShort || "—"}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                )}
+
+                {/* External-source footer link for prints */}
+                {isPrint && (
+                  <div class="mt-3 flex items-center justify-end">
+                    <span class="label-technical text-[10px]" style="color: var(--color-accent);">
+                      {robot.data.makerworld_url ? "MakerWorld ↗" : "Instagram ↗"}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </a>
+          );
+        })
+      }
+    </div>
+  </section>
 </BaseLayout>

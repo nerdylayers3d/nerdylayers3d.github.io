@@ -11,7 +11,7 @@ const { title, description, image } = Astro.props;
 const SITE_URL = "https://nerdylayers3d.com";
 const SITE_NAME = "Nerdy Layers 3D";
 const DEFAULT_DESCRIPTION =
-  "Combat robotics builds, 3D-printed mechanisms, and electronics tinkering by Nerdy Layers 3D.";
+  "I build combat robots and 3D-printed things. Sometimes they work.";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/nerdy-layers-logo.png`;
 
 const pageDescription = description || DEFAULT_DESCRIPTION;
@@ -50,31 +50,57 @@ const canonicalUrl = new URL(Astro.url.pathname, SITE_URL).toString();
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
     />
   </head>
 
   <body class="flex min-h-screen flex-col overflow-x-hidden">
-    <!-- Nav: full width, content-aligned start -->
+    <!-- Nav: sticky top, blends into the dark background with a thin divider -->
     <nav
-      class="flex w-full items-center border-b-2 px-5 py-3 shadow-[0_4px_18px_rgba(0,0,0,0.3)] sm:px-8 sm:py-4"
-      style="border-color: var(--color-accent); background: var(--color-surface);"
+      class="sticky top-0 z-50 flex w-full items-center justify-between border-b px-4 py-3 backdrop-blur sm:px-8 sm:py-4"
+      style="border-color: var(--color-border); background: rgba(20, 17, 32, 0.85);"
     >
       <a
         href="/"
-        class="brand-heading inline-flex items-center gap-2.5 text-xl no-underline hover:[color:var(--color-secondary)] sm:gap-3 sm:text-2xl"
+        class="inline-flex items-center gap-2.5 no-underline sm:gap-3"
       >
         <img
           src="/nerdy-layers-logo.png"
           alt="Nerdy Layers 3D"
-          class="h-9 w-9 rounded-lg object-cover sm:h-11 sm:w-11"
+          class="h-9 w-9 object-contain sm:h-10 sm:w-10"
         />
-        <span class="leading-none">Nerdy Layers</span>
+        <span
+          class="brand-heading text-lg leading-none sm:text-xl"
+          style="color: var(--color-accent);"
+        >Nerdy Layers 3D</span>
       </a>
+      <div class="hidden items-center gap-8 sm:flex">
+        <a
+          href="/#projects"
+          class="text-sm font-semibold transition-colors hover:[color:var(--color-accent)]"
+          style="color: var(--color-text);"
+        >Projects</a>
+        <a
+          href="https://makerworld.com/en/@nerdylayers3d"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm font-semibold transition-colors hover:[color:var(--color-accent)]"
+          style="color: var(--color-muted);"
+        >MakerWorld ↗</a>
+        <a
+          href="https://www.instagram.com/nerdylayers3d"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm font-semibold transition-colors hover:[color:var(--color-accent)]"
+          style="color: var(--color-muted);"
+        >Instagram ↗</a>
+      </div>
     </nav>
 
-    <!-- Main grows to fill remaining vertical space so footer hugs the bottom -->
-    <main class="w-full flex-1 px-5 py-5 sm:px-8 sm:py-8">
+    <!-- Main grows to fill remaining vertical space. No padding here; each
+         page section sets its own container/padding so the hero can run
+         full-bleed. -->
+    <main class="w-full flex-1">
       <slot />
     </main>
 

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nerdy Layers 3D | Combat Robotics &amp; 3D Printing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&amp;family=Plus+Jakarta+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #141120;
+            color: #e6dff4;
+            overflow-x: hidden;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .project-card-glow:hover {
+            box-shadow: 0px 4px 20px rgba(255, 183, 127, 0.2);
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#ffb77f",
+                    "on-tertiary-container": "#403a51",
+                    "secondary-fixed-dim": "#cbc3d8",
+                    "on-primary-container": "#613100",
+                    "outline": "#a58c7b",
+                    "error": "#ffb4ab",
+                    "surface-dim": "#141120",
+                    "tertiary": "#cbc2df",
+                    "on-error-container": "#ffdad6",
+                    "surface-container": "#201e2d",
+                    "inverse-surface": "#e6dff4",
+                    "surface-container-lowest": "#0f0c1a",
+                    "secondary-container": "#4e495a",
+                    "inverse-primary": "#914c00",
+                    "on-secondary-fixed": "#1d1928",
+                    "secondary": "#cbc3d8",
+                    "on-primary-fixed-variant": "#6f3900",
+                    "on-primary": "#4e2600",
+                    "tertiary-fixed-dim": "#cbc2df",
+                    "surface-container-high": "#2b2837",
+                    "on-tertiary-fixed-variant": "#49435b",
+                    "tertiary-fixed": "#e7defc",
+                    "surface-container-highest": "#363343",
+                    "surface": "#141120",
+                    "on-primary-fixed": "#2f1500",
+                    "tertiary-container": "#ada5c0",
+                    "outline-variant": "#564334",
+                    "surface-container-low": "#1c1a28",
+                    "on-background": "#e6dff4",
+                    "on-secondary-container": "#c0b8cd",
+                    "error-container": "#93000a",
+                    "primary-fixed-dim": "#ffb77f",
+                    "on-tertiary": "#322d43",
+                    "on-error": "#690005",
+                    "secondary-fixed": "#e7dff5",
+                    "on-surface": "#e6dff4",
+                    "on-secondary": "#322e3e",
+                    "inverse-on-surface": "#312e3e",
+                    "on-secondary-fixed-variant": "#494455",
+                    "surface-variant": "#363343",
+                    "on-tertiary-fixed": "#1d182e",
+                    "surface-tint": "#ffb77f",
+                    "surface-bright": "#3a3747",
+                    "primary-container": "#ff8a00",
+                    "primary-fixed": "#ffdcc4",
+                    "on-surface-variant": "#ddc1ae",
+                    "background": "#141120"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "label-technical": ["JetBrains Mono"],
+                    "headline-lg": ["Bricolage Grotesque"],
+                    "display-lg": ["Bricolage Grotesque"],
+                    "headline-md": ["Bricolage Grotesque"],
+                    "body-md": ["Plus Jakarta Sans"],
+                    "body-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-technical": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "display-lg": ["56px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Bar -->
+<nav class="bg-surface border-b border-outline-variant fixed full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-3">
+<img alt="Nerdy Layers 3D Logo" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLtaXpXbV8ayIYF047DS5h9f_h1SXCmunlFRsMt6JSBgVDzXGzk0l9yrzODKcAf-LWr5sW1aW4FWsoUZwVHTVp4oUORNoG1xCbKKBr9RBGtXYyYN4RO26GuvkEdbVwdUq9n3LARfdDKSsN60ieQCH_plx2V_IpQYPZozy1hQ9tOOkRTUPu8HSykI-FDq-sdzyByAjVzp5T4lw1BOgRF4cfYcAAw4G0oYCta5Oc5Tvp5Ed3zBmLykLPV5krMc"/>
+<span class="font-headline-md text-headline-md font-bold text-primary">Nerdy Layers 3D</span>
+</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 font-body-md text-body-md transition-colors duration-200" href="#">Projects</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="#">About</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-md text-body-md" href="#">External Stores</a>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-bold hover:scale-95 active:scale-90 transition-transform">Hire Me</button>
+</div>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</nav>
+<main class="pt-24 pb-20">
+<!-- Hero Section -->
+<header class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-16 md:py-24 text-center">
+<h1 class="font-display-lg text-display-lg text-white mb-6">
+                Combat Robotics &amp; <span class="text-primary">3D Printing</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto mb-10">
+                Precision engineered mechanisms and kinetic art. Exploring the intersection of high-performance manufacturing and heavy-duty hobbyist engineering.
+            </p>
+<div class="flex flex-wrap justify-center gap-4">
+<button class="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-lg hover:scale-95 active:scale-90 transition-transform flex items-center gap-2">
+                    View Portfolio <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="border border-primary text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-primary/10 transition-colors">
+                    The Workbench
+                </button>
+</div>
+</header>
+<!-- Project Grid (Bento Style) -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="flex justify-between items-end mb-12">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-white">Active Builds</h2>
+<p class="font-body-md text-on-tertiary-container">Documented engineering logs</p>
+</div>
+<div class="hidden md:block">
+<span class="font-label-technical text-label-technical text-primary uppercase tracking-widest">v2.4.0 Live</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Large Project 1: Apex Predator -->
+<article class="md:col-span-8 group relative overflow-hidden rounded-xl bg-surface-container border border-outline-variant project-card-glow transition-all duration-300">
+<div class="aspect-video w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A detailed close-up shot of a 3lb combat robot named Apex Predator, showcasing its rugged PA-CF carbon fiber chassis and bright orange TPU ablative armor plates. The robot is positioned on a metallic workbench under dramatic spotlighting, emphasizing the industrial textures and precision engineering. The background is a dark garage-tinkerer workshop with soft orange and purple ambient light. High-end product photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLraYpSMCeZDL4gLYUaJDHUPWWN7IVAOnxFJT-yGy7WrB3RoWpMqTbGBDZ0ndyzWquw5oTqXvFTwGCG6q--eMmFJyj8eKB_aYXig_FfUtaY0Vi1qNC5WodmdQSlXxSgWd9GNmYTZU3jo9thLJchNmsCvQ6tt4MiCwM7kOjtu9iGlV71-t3JWhL1l7mOx9XH6i5IKHswfndmoEQI-8_byxyblNx_2tiMgzDGnA8UnkjpXLAGFBBh2wVD8hXruDzClwSbfXZikLU_-Fd"/>
+</div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Apex Predator</h3>
+<div class="flex gap-2">
+<span class="bg-surface-container-high px-3 py-1 rounded text-xs font-label-technical text-secondary">BEETLEWEIGHT</span>
+<span class="bg-surface-container-high px-3 py-1 rounded text-xs font-label-technical text-secondary">3LB</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary text-4xl">precision_manufacturing</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-6">
+                            A beetleweight vertical spinner designed for extreme durability. Features a custom PA-CF (Carbon Fiber Reinforced Nylon) unibody chassis and modular TPU armor for energy absorption.
+                        </p>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-surface-container-low p-4 rounded-lg">
+<div>
+<span class="block font-label-technical text-secondary text-[10px] uppercase tracking-tighter">Material</span>
+<span class="font-label-technical text-white text-xs">PA-CF / TPU</span>
+</div>
+<div>
+<span class="block font-label-technical text-secondary text-[10px] uppercase tracking-tighter">Weapon</span>
+<span class="font-label-technical text-white text-xs">4" S7 Disc</span>
+</div>
+<div>
+<span class="block font-label-technical text-secondary text-[10px] uppercase tracking-tighter">Motor</span>
+<span class="font-label-technical text-white text-xs">Brushless Outrunner</span>
+</div>
+<div>
+<span class="block font-label-technical text-secondary text-[10px] uppercase tracking-tighter">Status</span>
+<span class="font-label-technical text-primary text-xs flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> READY
+                                </span>
+</div>
+</div>
+</div>
+</article>
+<!-- Project 2: Vector -->
+<article class="md:col-span-4 group rounded-xl bg-surface-container border border-outline-variant project-card-glow transition-all duration-300 flex flex-col">
+<div class="aspect-square w-full overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A professional studio photo of a 1lb antweight combat robot named Vector. The bot features a minimalist, high-impact white chassis with internal gyroid infill structures visible through semi-transparent sections. Its large horizontal spinning weapon is anodized orange. The lighting is crisp and technical, set against a deep purple and charcoal gradient background. Modern engineering aesthetic with a focus on geometric perfection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOjriUYzAOm78hoZ-oiAeuLFDn0al4fWcwn3XPhQEZji-BBl6B1Scz_7RxuyfYvJw8s4ouTHoyVrHk1uGNpzhOPTT2EuVDgXVIXg29nyEUwTVXAfUP0Fasnd7aRZHs0r7pMXlVumcWTBaDAinEhfAxCwRB4iF7xa1MF3SBmUnor7uceYWqjkxDRkSPYwOTy4Vw_nCq-_s-I0zyjOM7Gb5tKVGq72AUZljxogkdQfw0L9IswPaJ2cmrlc8jH5NHr18P6_B2LzvUDZeC"/>
+</div>
+<div class="p-6 flex-grow">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Vector</h3>
+<p class="font-body-md text-on-surface-variant mb-4 text-sm">
+                            High-impact 1lb antweight optimized for structural rigidity through internal Gyroid infill patterns.
+                        </p>
+<div class="mt-auto flex justify-between items-center">
+<span class="font-label-technical text-secondary text-xs">HORIZONTAL SPINNER</span>
+<button class="w-10 h-10 rounded-full border border-primary flex items-center justify-center text-primary hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined">launch</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Project 3: Cycloidal Gearbox -->
+<article class="md:col-span-5 group rounded-xl bg-surface-container border border-outline-variant project-card-glow transition-all duration-300">
+<div class="aspect-video w-full overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A technical cross-section render of a 3D printed cycloidal gearbox. The intricate internal gears and eccentric bearings are highlighted in vibrant orange and deep purple tones. The image captures the zero-backlash precision of the 3D printed transmission, set against a blueprint-style grid background with technical annotations in a monospaced font. Dark mode UI aesthetic with glowing accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCo5Kh_WMe6I1eqfTT4cHkbCetoAxwvviTzaPnI4DSroj9TPPkUVeCxAaz5i2EoFXaIrNL-AWq8lUYLZVFFgUEENOsCVVprMxPpg6m1zAWZBIKkJI8MoNTBlh_wFUxZbVa1yqTsTnrxHUbn5B4EvaJguKerWJD3vP2sEl5K5w68g0e5gM4_VhqNYpWs8GPcO0kyUoewvPl6aWSPff94uwfRXVNetCRXtIb70QQLNdbgskqxZkwTJcHixdleY_40HES9GzOR2pC6laa7"/>
+</div>
+<div class="p-6">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Cycloidal Gearbox</h3>
+<p class="font-body-md text-on-surface-variant mb-4">
+                            Zero-backlash 3D printed transmission system designed for high-torque robotic actuators.
+                        </p>
+<ul class="space-y-2 mb-6">
+<li class="flex items-center gap-2 text-xs font-label-technical text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-sm">check_circle</span> 30:1 Reduction Ratio
+                            </li>
+<li class="flex items-center gap-2 text-xs font-label-technical text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-sm">check_circle</span> Fully 3D Printable
+                            </li>
+</ul>
+</div>
+</article>
+<!-- Project 4: Custom LED Controller -->
+<article class="md:col-span-7 group flex flex-col md:flex-row rounded-xl bg-surface-container border border-outline-variant project-card-glow transition-all duration-300 overflow-hidden">
+<div class="md:w-1/2 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" data-alt="A macro photograph of a custom-designed PCB for an ESP32-based LED controller. The circuit board is matte black with gold-plated solder pads and glowing orange status LEDs. It is housed in a sleek, semi-transparent 3D printed enclosure that diffuses internal lighting. The mood is high-tech and energetic, with cinematic depth of field and vibrant high-density LED strips in the background blur." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzslZLlz7phFAoEbO6GqHQZQpzvwr-dqm_2ggsP9ZtYzOh_mJiJ9W0oLwz_m1XyB4qjc1mNiFE-Ei1-98NHYE1br1EFqeul0Vuy7G56wHs-0-M9PiHJXxBm5eGf7M30n8pGBsY-Ive41gDwXMhBgV6ggSjRnT6cbUkqXwA14fnlRJBJ_HpNgM8pn7vl7w3cgAUVZrAyFvyJYhsNZv3T5cAyAqRe0FiDkthsMhQyBwvd06Lreau-61-6go7UiyMCFg18dgdbyJ07png"/>
+</div>
+<div class="md:w-1/2 p-8 flex flex-col">
+<h3 class="font-headline-md text-headline-md text-primary mb-2">Custom LED Controller</h3>
+<p class="font-body-md text-on-surface-variant mb-6">
+                            An ESP32-based driver for high-density WS2812B strips. Features built-in level shifting, power management, and a custom 3D printed vented enclosure.
+                        </p>
+<div class="mt-auto">
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="border border-outline px-2 py-1 rounded text-[10px] font-label-technical uppercase">ESP32</span>
+<span class="border border-outline px-2 py-1 rounded text-[10px] font-label-technical uppercase">PCB Design</span>
+<span class="border border-outline px-2 py-1 rounded text-[10px] font-label-technical uppercase">WLED</span>
+</div>
+<button class="text-primary font-bold flex items-center gap-2 hover:gap-4 transition-all">
+                                Project Breakdown <span class="material-symbols-outlined">east</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Technical Specs / Design Philosophy -->
+<section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-24">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<div class="lg:col-span-1">
+<h2 class="font-headline-lg text-headline-lg text-white mb-6">Design Philosophy</h2>
+<p class="font-body-md text-on-surface-variant mb-8">
+                        Every project at Nerdy Layers is a balance between raw power and technical elegance. We don't just build; we optimize.
+                    </p>
+<div class="bg-surface-container-high p-6 rounded-xl border-l-4 border-primary">
+<span class="material-symbols-outlined text-primary mb-2" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<p class="font-body-md italic text-white">"In combat robotics, weight is the ultimate currency. In 3D printing, geometry is the ultimate tool."</p>
+</div>
+</div>
+<div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="bg-surface-container p-8 rounded-xl border border-outline-variant">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary">settings_suggest</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-white mb-4">Precision Iteration</h4>
+<p class="font-body-md text-on-surface-variant">Rapid prototyping using multi-material FDM to test mechanical fit before committing to final high-strength composites.</p>
+</div>
+<div class="bg-surface-container p-8 rounded-xl border border-outline-variant">
+<div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary">monitoring</span>
+</div>
+<h4 class="font-headline-md text-headline-md text-white mb-4">Data-Driven Design</h4>
+<p class="font-body-md text-on-surface-variant">Using FEA simulation and topological optimization to shave grams while maintaining structural integrity in high-kinetic environments.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-12 max-w-container-max mx-auto gap-gutter">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="flex items-center gap-3">
+<img alt="Nerdy Layers Logo" class="w-8 h-8 opacity-80" src="https://lh3.googleusercontent.com/aida/AP1WRLtaXpXbV8ayIYF047DS5h9f_h1SXCmunlFRsMt6JSBgVDzXGzk0l9yrzODKcAf-LWr5sW1aW4FWsoUZwVHTVp4oUORNoG1xCbKKBr9RBGtXYyYN4RO26GuvkEdbVwdUq9n3LARfdDKSsN60ieQCH_plx2V_IpQYPZozy1hQ9tOOkRTUPu8HSykI-FDq-sdzyByAjVzp5T4lw1BOgRF4cfYcAAw4G0oYCta5Oc5Tvp5Ed3zBmLykLPV5krMc"/>
+<span class="font-headline-md text-headline-md text-primary">Nerdy Layers 3D</span>
+</div>
+<p class="font-label-technical text-label-technical text-on-surface-variant">© 2024 Nerdy Layers 3D. Precision Engineered.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-label-technical text-label-technical text-on-surface-variant hover:text-primary-fixed-dim transition-colors opacity-80 hover:opacity-100" href="#">MakerWorld</a>
+<a class="font-label-technical text-label-technical text-on-surface-variant hover:text-primary-fixed-dim transition-colors opacity-80 hover:opacity-100" href="#">Printables</a>
+<a class="font-label-technical text-label-technical text-on-surface-variant hover:text-primary-fixed-dim transition-colors opacity-80 hover:opacity-100" href="#">Instagram</a>
+<a class="font-label-technical text-label-technical text-on-surface-variant hover:text-primary-fixed-dim transition-colors opacity-80 hover:opacity-100" href="#">YouTube</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple scroll effect for the header
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('bg-surface/95', 'backdrop-blur-md', 'shadow-xl');
+            } else {
+                nav.classList.remove('bg-surface/95', 'backdrop-blur-md', 'shadow-xl');
+            }
+        });
+
+        // Add subtle parallax to project images
+        document.querySelectorAll('article').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const img = card.querySelector('img');
+                if (!img) return;
+                const rect = card.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width - 0.5;
+                const y = (e.clientY - rect.top) / rect.height - 0.5;
+                img.style.transform = `scale(1.1) translate(${x * 10}px, ${y * 10}px)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                const img = card.querySelector('img');
+                if (img) img.style.transform = 'scale(1) translate(0, 0)';
+            });
+        });
+    </script>
+</body></html>

@@ -1,45 +1,50 @@
 @import "tailwindcss";
 
-/* Nerdy Layers 3D brand tokens — exposed as both Tailwind theme tokens (via
-   @theme) and CSS variables (so existing :root vars keep working during the
-   transition). */
+/* Nerdy Layers 3D brand tokens — Stitch "Kinetic Engineering" palette.
+   Exposed as both Tailwind theme tokens (via @theme) and CSS variables. */
 @theme {
-  --color-bg: #1f1b2e;
-  --color-bg-deep: #161220;
-  --color-surface: #2a2540;
-  --color-surface-hover: #352e50;
-  --color-border: #3d3656;
-  --color-text: #f4ede0;
-  --color-muted: #a39db8;
-  --color-accent: #f4a44a;
-  --color-accent-shadow: #e85c2c;
-  --color-secondary: #7dcce8;
-  --color-secondary-shadow: #4ea3c5;
-  --color-link: #7dcce8;
+  --color-bg: #141120;
+  --color-bg-deep: #0f0c1a;
+  --color-surface: #201e2d;
+  --color-surface-hover: #2b2837;
+  --color-surface-high: #2b2837;
+  --color-surface-highest: #363343;
+  --color-border: #3d3750;
+  --color-outline-variant: #564334;
+  --color-text: #e6dff4;
+  --color-muted: #8e899c;
+  --color-on-surface-variant: #ddc1ae;
+  --color-accent: #ffb77f;
+  --color-accent-strong: #ff8a00;
+  --color-accent-shadow: #6f3900;
+  --color-secondary: #cbc3d8;
+  --color-link: #ffb77f;
 
-  --font-display: "Fredoka", "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
-/* Legacy CSS variables (kept while we migrate the rest of the site to
-   Tailwind utilities). Same values as above. */
+/* Legacy CSS variables (still referenced by inline styles across the site).
+   Keep the same names but point them at the new palette so we don't have to
+   sweep every Astro file at once. */
 :root {
-  --bg: #1f1b2e;
-  --bg-deep: #161220;
-  --surface: #2a2540;
-  --surface-hover: #352e50;
-  --border: #3d3656;
-  --text: #f4ede0;
-  --text-muted: #a39db8;
-  --accent: #f4a44a;
-  --accent-shadow: #e85c2c;
-  --secondary: #7dcce8;
-  --secondary-shadow: #4ea3c5;
-  --link: #7dcce8;
-  --link-hover: #f4a44a;
+  --bg: #141120;
+  --bg-deep: #0f0c1a;
+  --surface: #201e2d;
+  --surface-hover: #2b2837;
+  --surface-high: #2b2837;
+  --border: #3d3750;
+  --text: #e6dff4;
+  --text-muted: #8e899c;
+  --accent: #ffb77f;
+  --accent-shadow: #ff8a00;
+  --secondary: #cbc3d8;
+  --secondary-shadow: #ff8a00;
+  --link: #ffb77f;
+  --link-hover: #ff8a00;
 }
 
-/* Base html / body — full width, no constraints anywhere. */
 html,
 body {
   width: 100%;
@@ -48,22 +53,20 @@ body {
 }
 
 body {
-  background:
-    radial-gradient(ellipse at top, rgba(244, 164, 74, 0.06), transparent 60%),
-    radial-gradient(ellipse at bottom, rgba(125, 204, 232, 0.04), transparent 60%),
-    var(--color-bg);
+  background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* Chunky 3D heading style that echoes the logo extrusion. */
+/* Display heading — Bricolage Grotesque, no chunky shadow (the Stitch style
+   is clean and bold rather than extruded). */
 .brand-heading {
   font-family: var(--font-display);
   color: var(--color-accent);
-  text-shadow: 2px 3px 0 var(--color-accent-shadow);
-  letter-spacing: 0.01em;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .brand-heading-sky {
@@ -72,25 +75,73 @@ body {
   font-weight: 600;
 }
 
-/* Status badge variants */
+/* Technical/monospace label, used for chips and small metadata. */
+.label-technical {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Status chip variants. Stitch uses muted surface-high backgrounds with
+   monospace text rather than the old high-contrast pill badges. */
 .badge {
-  @apply inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider;
+  @apply inline-flex items-center px-2.5 py-1 rounded text-[10px] font-medium uppercase tracking-wider;
+  font-family: var(--font-mono);
 }
 
 .badge-amber {
-  background: var(--color-accent);
-  color: var(--color-bg);
-  box-shadow: 0 2px 0 var(--color-accent-shadow);
+  background: var(--color-surface-highest);
+  color: var(--color-accent);
 }
 
 .badge-sky {
-  background: var(--color-secondary);
-  color: var(--color-bg);
-  box-shadow: 0 2px 0 var(--color-secondary-shadow);
+  background: var(--color-surface-highest);
+  color: var(--color-secondary);
 }
 
 .badge-orange-outline {
-  background: rgba(232, 92, 44, 0.25);
-  color: #f4a48a;
-  border: 1px solid rgba(232, 92, 44, 0.4);
+  background: rgba(255, 138, 0, 0.12);
+  color: var(--color-accent);
+  border: 1px solid rgba(255, 138, 0, 0.35);
+}
+
+/* Card hover glow — soft orange halo behind the card on hover. */
+.card-glow {
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 4px 24px rgba(255, 138, 0, 0.18);
+  border-color: rgba(255, 138, 0, 0.4);
+}
+
+/* Pulsing dot for "live"/active status indicators. */
+@keyframes nl-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.status-pulse {
+  animation: nl-pulse 1.8s ease-in-out infinite;
+}
+
+/* Pill button variants used in the hero. */
+.btn-primary {
+  @apply inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold transition-transform;
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+.btn-primary:hover {
+  transform: scale(0.97);
+}
+
+.btn-ghost {
+  @apply inline-flex items-center gap-2 rounded-full border px-6 py-3 font-bold transition-colors;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.btn-ghost:hover {
+  background: rgba(255, 138, 0, 0.1);
 }

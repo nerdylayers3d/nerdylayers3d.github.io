@@ -16,6 +16,7 @@ const { Content } = await render(robot);
 const data = robot.data;
 
 const name = data.robot_name || robot.id;
+const isPrint = data.category === "print";
 
 const weightDisplay = data.weight
   ? `${data.weight}g`
@@ -25,6 +26,9 @@ const weightDisplay = data.weight
       ? data.weight_note
       : undefined;
 
+// Spec list — only includes fields the entry actually has. Each row has a
+// short uppercase mono label + the value; some values are links to other
+// pages on the site (wikilink-resolved).
 const specs = [
   { label: "Status", value: data.status },
   { label: "Category", value: data.category },
@@ -53,11 +57,24 @@ const specs = [
   { label: "Receiver", value: data.receiver, link: resolveWikiLink(data.receiver) },
 ].filter((s) => s.value);
 
+// Prints have their own MakerWorld metrics — surface those as the spec panel
+// instead of robot tech specs.
+const printMetrics = [
+  { label: "Downloads", value: data.mw_downloads },
+  { label: "Prints", value: data.mw_prints },
+  { label: "Likes", value: data.mw_likes },
+  { label: "Boosts", value: data.mw_boosts },
+  { label: "Rating", value: data.mw_rating },
+  { label: "Category", value: data.makerworld_category },
+  { label: "Released", value: data.created },
+].filter((s) => s.value != null);
+
 const statusBadgeClass = (status: string | undefined) => {
   if (!status) return "";
   if (status === "discontinued" || status === "retired") return "badge-orange-outline";
   return "badge-sky";
 };
+const isActive = !isPrint && (data.status === "in-development" || data.status === "active");
 ---
 
 <BaseLayout
@@ -65,104 +82,203 @@ const statusBadgeClass = (status: string | undefined) => {
   description={data.concept || `${name} — a Nerdy Layers 3D project.`}
   image={data.cover}
 >
-  <div>
-    <a href="/" class="mb-6 inline-block text-sm" style="color: var(--color-muted);">
-      ← All Projects
+  <div class="mx-auto max-w-7xl px-4 py-8 sm:px-8 sm:py-12">
+    <a
+      href="/"
+      class="label-technical mb-6 inline-flex items-center gap-1 text-xs"
+      style="color: var(--color-muted);"
+    >
+      ← Back to projects
     </a>
 
-    <header class="mb-8">
-      <div class="mb-3 flex flex-wrap items-center gap-2">
+    {/* Hero header with cover */}
+    <header class="mb-10">
+      <div class="mb-4 flex flex-wrap items-center gap-2">
         <span class="badge badge-amber">{data.category || "robot"}</span>
-        {data.status && (
+        {data.status && !isPrint && (
           <span class={`badge ${statusBadgeClass(data.status)}`}>{data.status}</span>
         )}
+        {isActive && (
+          <span class="label-technical inline-flex items-center gap-1.5 text-[10px]" style="color: var(--color-accent);">
+            <span class="status-pulse h-1.5 w-1.5 rounded-full" style="background: var(--color-accent);"></span>
+            LIVE
+          </span>
+        )}
       </div>
-      <h1 class="brand-heading text-4xl sm:text-5xl md:text-6xl">{name}</h1>
+      <h1
+        class="brand-heading text-5xl leading-tight tracking-tight sm:text-6xl md:text-7xl"
+        style="color: var(--color-accent);"
+      >
+        {name}
+      </h1>
       {data.concept && (
-        <p class="mt-2 text-lg italic" style="color: var(--color-muted);">
+        <p class="mt-3 text-base sm:text-lg" style="color: var(--color-muted);">
           {data.concept}
         </p>
       )}
+
       {data.status === "discontinued" && data.discontinued_after && (
-        <p
-          class="mt-3 rounded border-l-4 px-3 py-2 text-sm"
-          style="background: rgba(232,92,44,0.08); border-color: var(--color-accent-shadow); color: var(--color-muted);"
+        <div
+          class="mt-5 flex items-start gap-3 rounded-lg border-l-4 p-4 text-sm"
+          style="background: rgba(255, 138, 0, 0.08); border-color: var(--color-accent-strong); color: var(--color-muted);"
         >
-          Retired after <strong style="color: var(--color-accent);">{data.discontinued_after}</strong>
-          {data.discontinued_date && <span> ({data.discontinued_date})</span>}
-          {data.successor && resolveRobotLink(data.successor) && (
-            <> — succeeded by <a href={resolveRobotLink(data.successor)!.href} class="underline">{resolveRobotLink(data.successor)!.name}</a></>
-          )}
-        </p>
+          <span class="label-technical shrink-0" style="color: var(--color-accent);">RETIRED</span>
+          <span>
+            after <strong style="color: var(--color-text);">{data.discontinued_after}</strong>
+            {data.discontinued_date && <span> ({data.discontinued_date})</span>}
+            {data.successor && resolveRobotLink(data.successor) && (
+              <> — succeeded by <a href={resolveRobotLink(data.successor)!.href} class="underline" style="color: var(--color-accent);">{resolveRobotLink(data.successor)!.name}</a></>
+            )}
+          </span>
+        </div>
       )}
-      {(data.cad || data.photos) && (
-        <p class="mt-3 flex flex-wrap gap-5 text-sm">
+
+      {/* External link bar — CAD/photos/MakerWorld/source */}
+      {(data.cad || data.photos || data.makerworld_url || data.source_url) && (
+        <div class="mt-6 flex flex-wrap gap-3">
           {data.cad && (
-            <a href={data.cad} target="_blank" rel="noopener noreferrer" style="color: var(--color-link);">
-              View CAD in Onshape →
+            <a
+              href={data.cad}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="label-technical inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs transition-colors"
+              style="border-color: var(--color-border); color: var(--color-text);"
+            >
+              <span style="color: var(--color-accent);">⚙</span> View CAD in Onshape ↗
             </a>
           )}
           {data.photos && (
-            <a href={data.photos} target="_blank" rel="noopener noreferrer" style="color: var(--color-link);">
-              Photo album →
+            <a
+              href={data.photos}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="label-technical inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs transition-colors"
+              style="border-color: var(--color-border); color: var(--color-text);"
+            >
+              <span style="color: var(--color-accent);">📷</span> Photo album ↗
             </a>
           )}
-        </p>
+          {data.makerworld_url && (
+            <a
+              href={data.makerworld_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="label-technical inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs"
+              style="background: var(--color-accent); color: var(--color-bg);"
+            >
+              Download on MakerWorld ↗
+            </a>
+          )}
+          {!data.makerworld_url && data.source_url && (
+            <a
+              href={data.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="label-technical inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs"
+              style="border-color: var(--color-border); color: var(--color-text);"
+            >
+              View on Instagram ↗
+            </a>
+          )}
+        </div>
       )}
     </header>
 
-    <section
-      class="mb-8 rounded-lg border p-5 sm:p-6"
-      style="background: var(--color-surface); border-color: var(--color-border);"
-    >
-      <h2 class="brand-heading-sky mb-4 text-xl">Specifications</h2>
-      <dl class="divide-y" style="--tw-divide-opacity:1; border-color: var(--color-border);">
-        {specs.map((spec, i) => (
-          <div class={`grid grid-cols-[35%_1fr] gap-3 py-2 ${i > 0 ? 'border-t' : ''}`} style="border-color: var(--color-border);">
-            <dt class="text-sm" style="color: var(--color-muted);">{spec.label}</dt>
-            <dd class="text-sm font-medium sm:text-base" style="overflow-wrap: anywhere;">
-              {spec.link ? (
-                <a href={spec.link.href} style="color: var(--color-link);">{spec.link.name}</a>
-              ) : (
-                displayValue(spec.value!)
-              )}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </section>
-
-    <section
-      class="rounded-lg border p-5 sm:p-8"
-      style="background: var(--color-surface); border-color: var(--color-border);"
-    >
-      <div class="prose-content">
-        <Content />
+    {/* Cover image, full-bleed within the container */}
+    {data.cover && (
+      <div
+        class="mb-10 overflow-hidden rounded-xl border"
+        style="border-color: var(--color-border); background: var(--color-bg-deep);"
+      >
+        <img
+          src={`/assets/${data.cover}`}
+          alt={`${name} cover photo`}
+          class="block max-h-[600px] w-full object-cover"
+        />
       </div>
-    </section>
+    )}
+
+    {/* 8/4 layout: build log + sticky sidebar */}
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
+      <article class="lg:col-span-8">
+        <h2 class="brand-heading mb-4 text-2xl sm:text-3xl">Build log</h2>
+        <div
+          class="prose-content rounded-xl border p-5 sm:p-8"
+          style="background: var(--color-surface); border-color: var(--color-border);"
+        >
+          <Content />
+        </div>
+      </article>
+
+      <aside class="lg:col-span-4">
+        <div class="lg:sticky lg:top-24">
+          <h2 class="brand-heading mb-4 text-xl">
+            {isPrint ? "Print stats" : "Specifications"}
+          </h2>
+          <div
+            class="rounded-xl border p-5"
+            style="background: var(--color-surface); border-color: var(--color-border);"
+          >
+            <dl class="divide-y" style="border-color: var(--color-border);">
+              {(isPrint ? printMetrics : specs).map((spec, i) => (
+                <div class={`grid grid-cols-[40%_1fr] items-baseline gap-3 py-2.5 ${i > 0 ? "border-t" : ""}`} style="border-color: var(--color-border);">
+                  <dt
+                    class="label-technical text-[10px]"
+                    style="color: var(--color-muted);"
+                  >
+                    {spec.label}
+                  </dt>
+                  <dd
+                    class="label-technical text-xs"
+                    style="color: var(--color-text); overflow-wrap: anywhere;"
+                  >
+                    {(spec as any).link ? (
+                      <a href={(spec as any).link.href} style="color: var(--color-accent);">
+                        {(spec as any).link.name}
+                      </a>
+                    ) : (
+                      displayValue(String(spec.value))
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </aside>
+    </div>
   </div>
 </BaseLayout>
 
 <style is:global>
-  /* Styling for markdown content inside .prose-content. Tailwind v4's @apply
-     inside scoped Astro <style> blocks can be finicky, so we use vanilla CSS
-     keyed on a class instead. */
+  /* Styling for markdown content inside .prose-content. Updated to Stitch
+     palette/typography (Bricolage headlines, accent orange links). */
   .prose-content {
     color: var(--color-text);
     overflow-wrap: anywhere;
   }
+  /* The print body markdown includes an Obsidian-style ![[cover.png]] image
+     so Obsidian shows the photo inline. The same cover is already rendered
+     in the page hero, so hide a leading body image to avoid the duplicate. */
+  .prose-content > p:first-child:has(> img:only-child) {
+    display: none;
+  }
+  .prose-content > img:first-child {
+    display: none;
+  }
   .prose-content h2 {
     font-family: var(--font-display);
-    color: var(--color-secondary);
+    color: var(--color-accent);
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     margin: 2rem 0 0.75rem;
+    letter-spacing: -0.01em;
   }
   .prose-content h3 {
     font-family: var(--font-display);
     color: var(--color-text);
     font-size: 1.2rem;
-    font-weight: 600;
+    font-weight: 700;
     margin: 1.5rem 0 0.5rem;
   }
   .prose-content h4 {
@@ -173,26 +289,29 @@ const statusBadgeClass = (status: string | undefined) => {
     margin: 1.25rem 0 0.4rem;
   }
   .prose-content p {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.85rem;
+    line-height: 1.65;
   }
   .prose-content a {
-    color: var(--color-link);
+    color: var(--color-accent);
     text-decoration: none;
     transition: color 0.15s;
   }
   .prose-content a:hover {
-    color: var(--color-accent);
+    color: var(--color-accent-strong);
     text-decoration: underline;
   }
   .prose-content strong {
-    color: var(--color-accent);
+    color: var(--color-text);
+    font-weight: 700;
   }
   .prose-content ul,
   .prose-content ol {
-    margin: 0.5rem 0 0.75rem 1.25rem;
+    margin: 0.5rem 0 0.85rem 1.25rem;
   }
   .prose-content li {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.3rem;
+    line-height: 1.6;
   }
   .prose-content hr {
     border: none;
@@ -202,8 +321,9 @@ const statusBadgeClass = (status: string | undefined) => {
   .prose-content img {
     max-width: 100%;
     height: auto;
-    border-radius: 6px;
-    margin: 1rem 0;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+    border: 1px solid var(--color-border);
   }
   .prose-content table {
     display: block;
@@ -212,6 +332,7 @@ const statusBadgeClass = (status: string | undefined) => {
     border-collapse: collapse;
     font-size: 0.85rem;
     margin: 1rem 0;
+    font-family: var(--font-mono);
   }
   .prose-content th,
   .prose-content td {
@@ -221,30 +342,37 @@ const statusBadgeClass = (status: string | undefined) => {
   }
   .prose-content th {
     background: var(--color-bg-deep);
-    color: var(--color-secondary);
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
   }
   .prose-content pre {
     overflow-x: auto;
     max-width: 100%;
     background: var(--color-bg-deep);
-    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
     padding: 1rem;
     font-size: 0.85rem;
     margin: 1rem 0;
+    font-family: var(--font-mono);
   }
   .prose-content code {
     background: var(--color-bg-deep);
-    color: var(--color-secondary);
+    color: var(--color-accent);
     padding: 0.1rem 0.3rem;
-    border-radius: 3px;
+    border-radius: 4px;
     font-size: 0.9em;
+    font-family: var(--font-mono);
   }
   .prose-content pre code {
     background: transparent;
     padding: 0;
+    color: var(--color-text);
   }
   .prose-content blockquote {
-    border-left: 3px solid var(--color-secondary);
+    border-left: 3px solid var(--color-accent);
     padding-left: 1rem;
     margin: 1rem 0;
     color: var(--color-muted);
@@ -270,20 +398,20 @@ const statusBadgeClass = (status: string | undefined) => {
     border: 0;
   }
 
-  /* Obsidian callouts (rendered by remark-callouts.mjs) */
+  /* Obsidian callouts — re-tuned to Stitch palette (orange accents). */
   .callout {
-    border-radius: 8px;
+    border-radius: 10px;
     border-left: 4px solid var(--color-muted);
-    background: rgba(58, 50, 86, 0.4);
-    padding: 0.85rem 1rem 0.5rem;
-    margin: 1.25rem 0;
+    background: rgba(54, 51, 67, 0.5);
+    padding: 0.85rem 1.1rem 0.6rem;
+    margin: 1.5rem 0;
   }
   .callout > .callout-title {
-    font-family: var(--font-display);
+    font-family: var(--font-mono);
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     margin-bottom: 0.4rem;
     color: var(--color-muted);
   }
@@ -294,7 +422,7 @@ const statusBadgeClass = (status: string | undefined) => {
   .callout-failure,
   .callout-danger {
     border-left-color: var(--color-accent);
-    background: rgba(244, 164, 74, 0.08);
+    background: rgba(255, 138, 0, 0.08);
   }
   .callout-warning > .callout-title,
   .callout-failure > .callout-title,
@@ -307,7 +435,7 @@ const statusBadgeClass = (status: string | undefined) => {
   .callout-abstract,
   .callout-question {
     border-left-color: var(--color-secondary);
-    background: rgba(125, 204, 232, 0.08);
+    background: rgba(203, 195, 216, 0.08);
   }
   .callout-info > .callout-title,
   .callout-note > .callout-title,
@@ -325,11 +453,11 @@ const statusBadgeClass = (status: string | undefined) => {
   }
   .callout-bug,
   .callout-important {
-    border-left-color: var(--color-accent-shadow);
-    background: rgba(232, 92, 44, 0.1);
+    border-left-color: var(--color-accent-strong);
+    background: rgba(255, 138, 0, 0.12);
   }
   .callout-bug > .callout-title,
   .callout-important > .callout-title {
-    color: var(--color-accent-shadow);
+    color: var(--color-accent-strong);
   }
 </style>
